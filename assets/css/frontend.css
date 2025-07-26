@@ -1,0 +1,1085 @@
+/**
+ * WooAccordion Pro - Frontend Styles
+ * Version: 1.0.0
+ */
+
+/* CSS Variables for customization */
+:root {
+    --wap-header-bg: #f8f9fa;
+    --wap-header-text: #495057;
+    --wap-active-header-bg: #6366f1;
+    --wap-active-header-text: #ffffff;
+    --wap-content-bg: #ffffff;
+    --wap-border-color: #dee2e6;
+    --wap-animation-duration: 300ms;
+    --wap-border-radius: 8px;
+    --wap-spacing: 1rem;
+    --wap-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Container Styles */
+.wap-accordion-container {
+    margin: 2rem 0;
+    max-width: 100%;
+}
+
+.wap-accordion {
+    border: 1px solid var(--wap-border-color);
+    border-radius: var(--wap-border-radius);
+    overflow: hidden;
+    box-shadow: var(--wap-shadow);
+}
+
+/* Accordion Item */
+.wap-accordion-item {
+    border-bottom: 1px solid var(--wap-border-color);
+}
+
+.wap-accordion-item:last-child {
+    border-bottom: none;
+}
+
+/* Accordion Header */
+.wap-accordion-header {
+    display: flex;
+    align-items: center;
+    padding: var(--wap-spacing) 1.5rem;
+    background-color: var(--wap-header-bg);
+    color: var(--wap-header-text);
+    cursor: pointer;
+    transition: all var(--wap-animation-duration) ease;
+    font-weight: 500;
+    font-size: 1rem;
+    line-height: 1.5;
+    border: none;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    user-select: none;
+}
+
+.wap-accordion-header:hover {
+    background-color: #e9ecef;
+}
+
+.wap-accordion-header.wap-active {
+    background-color: var(--wap-active-header-bg);
+    color: var(--wap-active-header-text);
+}
+
+.wap-accordion-header.wap-active:hover {
+    background-color: var(--wap-active-header-bg);
+    opacity: 0.9;
+}
+
+/* Header Components */
+.wap-accordion-icon {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.wap-accordion-title {
+    flex-grow: 1;
+    margin-right: 1rem;
+}
+
+.wap-accordion-toggle {
+    font-size: 0.9rem;
+    transition: transform var(--wap-animation-duration) ease;
+    flex-shrink: 0;
+}
+
+.wap-accordion-header.wap-active .wap-accordion-toggle {
+    transform: rotate(180deg);
+}
+
+/* Accordion Content */
+.wap-accordion-content {
+    background-color: var(--wap-content-bg);
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height var(--wap-animation-duration) ease-out;
+}
+
+.wap-accordion-content.wap-active {
+    max-height: 2000px; /* Large enough value for most content */
+}
+
+.wap-accordion-content-inner {
+    padding: var(--wap-spacing) 1.5rem;
+    border-top: 1px solid var(--wap-border-color);
+}
+
+/* Animation Classes */
+.wap-accordion[data-animation="fade"] .wap-accordion-content {
+    opacity: 0;
+    transition: opacity var(--wap-animation-duration) ease, max-height var(--wap-animation-duration) ease;
+}
+
+.wap-accordion[data-animation="fade"] .wap-accordion-content.wap-active {
+    opacity: 1;
+}
+
+.wap-accordion[data-animation="slide"] .wap-accordion-content {
+    transform: translateY(-10px);
+    transition: transform var(--wap-animation-duration) ease, max-height var(--wap-animation-duration) ease;
+}
+
+.wap-accordion[data-animation="slide"] .wap-accordion-content.wap-active {
+    transform: translateY(0);
+}
+
+.wap-accordion[data-animation="bounce"] .wap-accordion-content.wap-active {
+    animation: wap-bounce-in var(--wap-animation-duration) ease;
+}
+
+@keyframes wap-bounce-in {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Layout Templates */
+
+/* Modern Card Template */
+.wap-template-modern-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wap-template-modern-card .wap-accordion-item {
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--wap-border-color);
+}
+
+.wap-template-modern-card .wap-accordion-item:last-child {
+    margin-bottom: 0;
+}
+
+.wap-template-modern-card .wap-accordion-header {
+    border-radius: 8px 8px 0 0;
+    background: linear-gradient(135deg, var(--wap-header-bg) 0%, #f1f3f4 100%);
+}
+
+.wap-template-modern-card .wap-accordion-header.wap-active {
+    background: linear-gradient(135deg, var(--wap-active-header-bg) 0%, #5046e4 100%);
+    border-radius: 8px 8px 0 0;
+}
+
+/* Minimal Flat Template */
+.wap-template-minimal-flat {
+    border: none;
+    box-shadow: none;
+}
+
+.wap-template-minimal-flat .wap-accordion-item {
+    border: none;
+    border-bottom: 2px solid var(--wap-border-color);
+}
+
+.wap-template-minimal-flat .wap-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.wap-template-minimal-flat .wap-accordion-header {
+    background: transparent;
+    border-radius: 0;
+    padding: 1.25rem 0;
+}
+
+.wap-template-minimal-flat .wap-accordion-header:hover {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.wap-template-minimal-flat .wap-accordion-header.wap-active {
+    background: transparent;
+    border-bottom: 2px solid var(--wap-active-header-bg);
+}
+
+.wap-template-minimal-flat .wap-accordion-content-inner {
+    padding: 1.25rem 0;
+    border-top: none;
+}
+
+/* Material Design Template */
+.wap-template-material-design {
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12), 0 0 6px rgba(0, 0, 0, 0.04);
+}
+
+.wap-template-material-design .wap-accordion-item {
+    margin-bottom: 8px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    transition: box-shadow var(--wap-animation-duration) ease;
+}
+
+.wap-template-material-design .wap-accordion-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.wap-template-material-design .wap-accordion-header {
+    background: var(--wap-header-bg);
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.25px;
+}
+
+.wap-template-material-design .wap-accordion-header.wap-active {
+    background: var(--wap-active-header-bg);
+    box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
+}
+
+.wap-template-material-design .wap-accordion-content-inner {
+    padding: 1.5rem;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+    .wap-accordion-container {
+        margin: 1rem 0;
+    }
+
+    .wap-accordion-header {
+        padding: 1.25rem 1rem;
+        font-size: 1rem;
+    }
+
+    .wap-accordion-content-inner {
+        padding: 1.25rem 1rem;
+    }
+
+    .wap-accordion-icon {
+        margin-right: 0.5rem;
+        font-size: 1rem;
+        width: 18px;
+    }
+
+    .wap-accordion-toggle {
+        font-size: 0.8rem;
+    }
+
+    /* Touch-friendly spacing */
+    .wap-template-modern-card .wap-accordion-item {
+        margin-bottom: 0.75rem;
+    }
+
+    .wap-template-material-design .wap-accordion-item {
+        margin-bottom: 12px;
+    }
+
+    /* Increase touch targets */
+    .wap-accordion-header {
+        min-height: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .wap-accordion-header {
+        padding: 1rem 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .wap-accordion-content-inner {
+        padding: 1rem 0.75rem;
+    }
+
+    .wap-accordion-icon {
+        margin-right: 0.4rem;
+        font-size: 0.9rem;
+        width: 16px;
+    }
+}
+
+/* Content Styling */
+.wap-accordion-content-inner h1,
+.wap-accordion-content-inner h2,
+.wap-accordion-content-inner h3,
+.wap-accordion-content-inner h4,
+.wap-accordion-content-inner h5,
+.wap-accordion-content-inner h6 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    color: var(--wap-header-text);
+}
+
+.wap-accordion-content-inner p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.wap-accordion-content-inner p:last-child {
+    margin-bottom: 0;
+}
+
+.wap-accordion-content-inner ul,
+.wap-accordion-content-inner ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+}
+
+.wap-accordion-content-inner li {
+    margin-bottom: 0.25rem;
+}
+
+.wap-accordion-content-inner table {
+    width: 100%;
+    margin-bottom: 1rem;
+    border-collapse: collapse;
+}
+
+.wap-accordion-content-inner table th,
+.wap-accordion-content-inner table td {
+    padding: 0.75rem;
+    border: 1px solid var(--wap-border-color);
+    text-align: left;
+}
+
+.wap-accordion-content-inner table th {
+    background-color: var(--wap-header-bg);
+    font-weight: 600;
+}
+
+/* Loading States */
+.wap-accordion-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wap-accordion-loading .wap-accordion-header {
+    cursor: not-allowed;
+}
+
+/* Focus States for Accessibility */
+.wap-accordion-header:focus {
+    outline: 2px solid var(--wap-active-header-bg);
+    outline-offset: 2px;
+}
+
+.wap-accordion-header:focus-visible {
+    outline: 2px solid var(--wap-active-header-bg);
+    outline-offset: 2px;
+}
+
+/* Animations for Better UX */
+.wap-accordion-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.wap-accordion-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.wap-accordion-header:hover::before {
+    left: 100%;
+}
+
+/* Custom Scrollbar for Content */
+.wap-accordion-content-inner::-webkit-scrollbar {
+    width: 6px;
+}
+
+.wap-accordion-content-inner::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.wap-accordion-content-inner::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.wap-accordion-content-inner::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* RTL Support */
+[dir="rtl"] .wap-accordion-icon {
+    margin-right: 0;
+    margin-left: 0.75rem;
+}
+
+[dir="rtl"] .wap-accordion-title {
+    margin-right: 0;
+    margin-left: 1rem;
+}
+
+[dir="rtl"] .wap-accordion-content-inner ul,
+[dir="rtl"] .wap-accordion-content-inner ol {
+    padding-left: 0;
+    padding-right: 1.5rem;
+}
+
+/* Print Styles */
+@media print {
+    .wap-accordion-container {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .wap-accordion-content {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .wap-accordion-toggle {
+        display: none;
+    }
+
+    .wap-accordion-header {
+        background: #f8f9fa !important;
+        color: #333 !important;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .wap-accordion {
+        border: 2px solid #000;
+    }
+
+    .wap-accordion-header {
+        border-bottom: 1px solid #000;
+    }
+
+    .wap-accordion-header.wap-active {
+        background: #000;
+        color: #fff;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .wap-accordion-header,
+    .wap-accordion-content,
+    .wap-accordion-toggle {
+        transition: none;
+    }
+
+    .wap-accordion-content.wap-active {
+        animation: none;
+    }
+
+    .wap-accordion-header::before {
+        transition: none;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --wap-header-bg: #2d3748;
+        --wap-header-text: #e2e8f0;
+        --wap-content-bg: #1a202c;
+        --wap-border-color: #4a5568;
+    }
+
+    .wap-accordion-content-inner {
+        color: #e2e8f0;
+    }
+
+    .wap-accordion-content-inner table th {
+        background-color: #2d3748;
+        color: #e2e8f0;
+    }
+}
+
+
+
+/**
+ * Enhanced Animation System - Add to frontend.css
+ * Advanced animations with easing and stagger effects
+ */
+
+/* Enhanced Animation Variables */
+:root {
+    --wap-animation-duration: 300ms;
+    --wap-animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+    --wap-stagger-delay: 50ms;
+}
+
+/* Enhanced Base Animations */
+.wap-accordion-content {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: 
+        max-height var(--wap-animation-duration) var(--wap-animation-easing),
+        opacity calc(var(--wap-animation-duration) * 0.8) var(--wap-animation-easing),
+        transform var(--wap-animation-duration) var(--wap-animation-easing);
+}
+
+.wap-accordion-content.wap-active {
+    max-height: 2000px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Enhanced Animation Types */
+
+/* 1. Slide with Spring Easing */
+.wap-accordion[data-animation="slide-spring"] .wap-accordion-content {
+    transition: 
+        max-height 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 300ms ease-out,
+        transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* 2. Fade with Scale */
+.wap-accordion[data-animation="fade-scale"] .wap-accordion-content {
+    transform: scale(0.95);
+    transition: 
+        max-height var(--wap-animation-duration) ease-out,
+        opacity var(--wap-animation-duration) ease-out,
+        transform var(--wap-animation-duration) cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.wap-accordion[data-animation="fade-scale"] .wap-accordion-content.wap-active {
+    transform: scale(1);
+}
+
+/* 3. Elastic Bounce */
+.wap-accordion[data-animation="elastic"] .wap-accordion-content.wap-active {
+    animation: wap-elastic-in 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes wap-elastic-in {
+    0% {
+        transform: scale(0.8) translateY(-20px);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.05) translateY(5px);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 4. Slide from Left */
+.wap-accordion[data-animation="slide-left"] .wap-accordion-content {
+    transform: translateX(-30px);
+    transition: 
+        max-height var(--wap-animation-duration) ease-out,
+        opacity var(--wap-animation-duration) ease-out,
+        transform var(--wap-animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wap-accordion[data-animation="slide-left"] .wap-accordion-content.wap-active {
+    transform: translateX(0);
+}
+
+/* 5. Flip Effect */
+.wap-accordion[data-animation="flip"] .wap-accordion-content {
+    transform: perspective(1000px) rotateX(-90deg);
+    transform-origin: top;
+    transition: 
+        max-height var(--wap-animation-duration) ease-out,
+        opacity var(--wap-animation-duration) ease-out,
+        transform var(--wap-animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wap-accordion[data-animation="flip"] .wap-accordion-content.wap-active {
+    transform: perspective(1000px) rotateX(0deg);
+}
+
+/* 6. Stagger Animation for Multiple Items */
+.wap-accordion[data-stagger="true"] .wap-accordion-item {
+    animation: wap-stagger-in 500ms ease-out backwards;
+}
+
+.wap-accordion[data-stagger="true"] .wap-accordion-item:nth-child(1) {
+    animation-delay: 0ms;
+}
+
+.wap-accordion[data-stagger="true"] .wap-accordion-item:nth-child(2) {
+    animation-delay: var(--wap-stagger-delay);
+}
+
+.wap-accordion[data-stagger="true"] .wap-accordion-item:nth-child(3) {
+    animation-delay: calc(var(--wap-stagger-delay) * 2);
+}
+
+.wap-accordion[data-stagger="true"] .wap-accordion-item:nth-child(4) {
+    animation-delay: calc(var(--wap-stagger-delay) * 3);
+}
+
+.wap-accordion[data-stagger="true"] .wap-accordion-item:nth-child(5) {
+    animation-delay: calc(var(--wap-stagger-delay) * 4);
+}
+
+@keyframes wap-stagger-in {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Enhanced Header Animations */
+.wap-accordion-header {
+    position: relative;
+    overflow: hidden;
+}
+
+.wap-accordion-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.wap-accordion-header:hover::before {
+    left: 100%;
+}
+
+/* Enhanced Toggle Icon Animation */
+.wap-accordion-toggle {
+    transition: transform var(--wap-animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wap-accordion-header.wap-active .wap-accordion-toggle {
+    transform: rotate(180deg);
+}
+
+/* Icon-specific animations */
+.wap-accordion-toggle i {
+    transition: all var(--wap-animation-duration) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.wap-accordion-header.wap-active .wap-accordion-toggle i.fa-plus {
+    transform: rotate(45deg);
+}
+
+.wap-accordion-header.wap-active .wap-accordion-toggle i.fa-chevron-down {
+    transform: rotate(180deg);
+}
+
+/* Micro-animations for better UX */
+.wap-accordion-item {
+    transition: transform 200ms ease;
+}
+
+.wap-accordion-item:hover {
+    transform: translateY(-1px);
+}
+
+.wap-accordion-header:active {
+    transform: scale(0.98);
+    transition: transform 100ms ease;
+}
+
+/* Advanced Easing Options */
+.wap-accordion[data-easing="ease-in-out-back"] .wap-accordion-content {
+    transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.wap-accordion[data-easing="ease-in-out-circ"] .wap-accordion-content {
+    transition-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+}
+
+.wap-accordion[data-easing="ease-in-out-expo"] .wap-accordion-content {
+    transition-timing-function: cubic-bezier(1, 0, 0, 1);
+}
+
+.wap-accordion[data-easing="ease-in-out-sine"] .wap-accordion-content {
+    transition-timing-function: cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+
+/* Performance Optimizations */
+.wap-accordion-content {
+    will-change: max-height, opacity, transform;
+}
+
+.wap-accordion-header {
+    will-change: background-color, color;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .wap-accordion-content,
+    .wap-accordion-header,
+    .wap-accordion-toggle,
+    .wap-accordion-item {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+
+
+
+/**
+ * Additional Styling Templates - Add to frontend.css
+ * New templates: Glassmorphism, Neumorphism, Dark Mode, Corporate
+ */
+
+/* 4. Glassmorphism Template */
+.wap-template-glassmorphism {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.wap-template-glassmorphism .wap-accordion-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    margin-bottom: 8px;
+    backdrop-filter: blur(5px);
+}
+
+.wap-template-glassmorphism .wap-accordion-header {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px 12px 0 0;
+    backdrop-filter: blur(10px);
+    border: none;
+}
+
+.wap-template-glassmorphism .wap-accordion-header:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.wap-template-glassmorphism .wap-accordion-header.wap-active {
+    background: rgba(var(--wap-active-header-bg), 0.2);
+    color: var(--wap-active-header-text);
+}
+
+.wap-template-glassmorphism .wap-accordion-content-inner {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 0 0 12px 12px;
+    backdrop-filter: blur(5px);
+}
+
+/* 5. Neumorphism Template */
+.wap-template-neumorphism {
+    background: #e0e5ec;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 
+        20px 20px 60px #bebebe,
+        -20px -20px 60px #ffffff;
+}
+
+.wap-template-neumorphism .wap-accordion-item {
+    background: #e0e5ec;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 
+        inset 5px 5px 10px #bebebe,
+        inset -5px -5px 10px #ffffff;
+}
+
+.wap-template-neumorphism .wap-accordion-header {
+    background: #e0e5ec;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 
+        5px 5px 10px #bebebe,
+        -5px -5px 10px #ffffff;
+    transition: all 0.3s ease;
+}
+
+.wap-template-neumorphism .wap-accordion-header:hover {
+    box-shadow: 
+        3px 3px 6px #bebebe,
+        -3px -3px 6px #ffffff;
+}
+
+.wap-template-neumorphism .wap-accordion-header.wap-active {
+    box-shadow: 
+        inset 3px 3px 6px #bebebe,
+        inset -3px -3px 6px #ffffff;
+}
+
+.wap-template-neumorphism .wap-accordion-content-inner {
+    background: transparent;
+    border: none;
+    margin-top: 10px;
+}
+
+/* 6. Dark Mode Template */
+.wap-template-dark-mode {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    color: #ffffff;
+}
+
+.wap-template-dark-mode .wap-accordion-item {
+    background: #2d2d2d;
+    border: 1px solid #404040;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.wap-template-dark-mode .wap-accordion-header {
+    background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    color: #ffffff;
+    border-radius: 8px 8px 0 0;
+    border: none;
+}
+
+.wap-template-dark-mode .wap-accordion-header:hover {
+    background: linear-gradient(135deg, #404040 0%, #2d2d2d 100%);
+}
+
+.wap-template-dark-mode .wap-accordion-header.wap-active {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: #ffffff;
+}
+
+.wap-template-dark-mode .wap-accordion-content-inner {
+    background: #1a1a1a;
+    color: #e5e5e5;
+    border-top: 1px solid #404040;
+}
+
+.wap-template-dark-mode .wap-accordion-toggle {
+    color: #888;
+}
+
+.wap-template-dark-mode .wap-accordion-header.wap-active .wap-accordion-toggle {
+    color: #ffffff;
+}
+
+/* 7. Corporate Template */
+.wap-template-corporate {
+    background: #ffffff;
+    border: 2px solid #1f2937;
+    border-radius: 0;
+    font-family: 'Arial', sans-serif;
+}
+
+.wap-template-corporate .wap-accordion-item {
+    background: #ffffff;
+    border: none;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.wap-template-corporate .wap-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.wap-template-corporate .wap-accordion-header {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    color: #1f2937;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: none;
+    border-radius: 0;
+    padding: 1.25rem 2rem;
+}
+
+.wap-template-corporate .wap-accordion-header:hover {
+    background: linear-gradient(to right, #e5e7eb, #f8f9fa);
+}
+
+.wap-template-corporate .wap-accordion-header.wap-active {
+    background: linear-gradient(to right, #1f2937, #374151);
+    color: #ffffff;
+}
+
+.wap-template-corporate .wap-accordion-content-inner {
+    padding: 2rem;
+    background: #ffffff;
+    border-top: 1px solid #e5e7eb;
+    line-height: 1.8;
+}
+
+.wap-template-corporate .wap-accordion-icon {
+    font-weight: bold;
+}
+
+/* 8. Gradient Template */
+.wap-template-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 4px;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.wap-template-gradient .wap-accordion {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.wap-template-gradient .wap-accordion-item {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.wap-template-gradient .wap-accordion-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.wap-template-gradient .wap-accordion-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: -1;
+}
+
+.wap-template-gradient .wap-accordion-header:hover::before {
+    left: 0;
+    opacity: 0.1;
+}
+
+.wap-template-gradient .wap-accordion-header.wap-active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
+}
+
+.wap-template-gradient .wap-accordion-header.wap-active::before {
+    opacity: 0;
+}
+
+/* 9. Minimal Lines Template */
+.wap-template-minimal-lines {
+    background: transparent;
+    border: none;
+}
+
+.wap-template-minimal-lines .wap-accordion-item {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0;
+}
+
+.wap-template-minimal-lines .wap-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.wap-template-minimal-lines .wap-accordion-header {
+    background: transparent;
+    padding: 1.5rem 0;
+    border: none;
+    border-radius: 0;
+    position: relative;
+}
+
+.wap-template-minimal-lines .wap-accordion-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--wap-active-header-bg);
+    transition: width 0.3s ease;
+}
+
+.wap-template-minimal-lines .wap-accordion-header:hover::after {
+    width: 30%;
+}
+
+.wap-template-minimal-lines .wap-accordion-header.wap-active::after {
+    width: 100%;
+}
+
+.wap-template-minimal-lines .wap-accordion-content-inner {
+    padding: 1.5rem 0;
+    border: none;
+    background: transparent;
+}
+
+/* 10. Card Stack Template */
+.wap-template-card-stack {
+    background: transparent;
+    border: none;
+    perspective: 1000px;
+}
+
+.wap-template-card-stack .wap-accordion-item {
+    background: #ffffff;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    box-shadow: 
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.08);
+    transform: translateZ(0);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+
+.wap-template-card-stack .wap-accordion-item:hover {
+    transform: translateY(-4px) rotateX(5deg);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.15),
+        0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.wap-template-card-stack .wap-accordion-item::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    background: rgba(0, 0, 0, 0.02);
+    border-radius: 8px;
+    z-index: -1;
+}
+
+.wap-template-card-stack .wap-accordion-header {
+    background: transparent;
+    border: none;
+    border-radius: 12px 12px 0 0;
+}
+
+.wap-template-card-stack .wap-accordion-header.wap-active {
+    background: var(--wap-active-header-bg);
+    color: var(--wap-active-header-text);
+}
+
+.wap-template-card-stack .wap-accordion-content-inner {
+    border: none;
+    background: transparent;
+}

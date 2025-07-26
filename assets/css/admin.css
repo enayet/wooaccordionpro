@@ -1,0 +1,630 @@
+/**
+ * WooAccordion Pro - Admin Styles
+ * Version: 1.0.0
+ */
+
+/* Admin Wrap */
+.wap-admin-wrap {
+    margin: 20px 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Admin Header */
+.wap-admin-header {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.wap-admin-header-content h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.wap-admin-header-content p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 1.1rem;
+}
+
+.wap-admin-header-stats {
+    display: flex;
+    gap: 2rem;
+}
+
+.wap-stat {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.wap-stat-number {
+    display: block;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fbbf24;
+}
+
+.wap-stat-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Admin Content Layout */
+.wap-admin-content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+}
+
+.wap-admin-main {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.wap-admin-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Settings Tabs */
+.wap-settings-tabs {
+    border: none;
+}
+
+.wap-tab-nav {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+}
+
+.wap-tab-button {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    position: relative;
+}
+
+.wap-tab-button:hover {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.wap-tab-button.active {
+    color: #6366f1;
+    border-bottom-color: #6366f1;
+    background: white;
+}
+
+.wap-tab-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: white;
+}
+
+/* Tab Content */
+.wap-tab-content {
+    padding: 2rem;
+}
+
+.wap-tab-panel {
+    display: none;
+}
+
+.wap-tab-panel.active {
+    display: block;
+}
+
+.wap-tab-panel h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.4rem;
+    color: #1f2937;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 0.5rem;
+}
+
+.wap-tab-panel > p {
+    margin: 0 0 2rem 0;
+    color: #6b7280;
+    font-size: 1rem;
+}
+
+/* Form Fields */
+.wap-form-field {
+    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.wap-form-field label {
+    font-weight: 600;
+    color: #374151;
+    padding-top: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.wap-form-field input[type="text"],
+.wap-form-field input[type="number"],
+.wap-form-field select,
+.wap-form-field textarea {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wap-form-field input[type="text"]:focus,
+.wap-form-field input[type="number"]:focus,
+.wap-form-field select:focus,
+.wap-form-field textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.wap-form-field input[type="color"] {
+    width: 60px;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.wap-form-field input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    accent-color: #6366f1;
+}
+
+.wap-form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.wap-form-field .description {
+    margin: 0.5rem 0 0 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+    grid-column: 2;
+}
+
+/* Form Actions */
+.wap-form-actions {
+    padding: 2rem;
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.wap-form-actions .button-primary {
+    background: #6366f1;
+    border-color: #6366f1;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.wap-form-actions .button-primary:hover {
+    background: #4f46e5;
+    border-color: #4f46e5;
+    transform: translateY(-1px);
+}
+
+.wap-form-actions .button-secondary {
+    background: white;
+    border-color: #d1d5db;
+    color: #374151;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.wap-form-actions .button-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.wap-form-actions .button-link-delete {
+    color: #dc2626;
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.wap-form-actions .button-link-delete:hover {
+    color: #b91c1c;
+    text-decoration: underline;
+}
+
+/* Sidebar Boxes */
+.wap-admin-box {
+    background: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+}
+
+.wap-admin-box h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1.2rem;
+    color: #1f2937;
+}
+
+.wap-admin-box ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.wap-admin-box li {
+    margin-bottom: 0.75rem;
+}
+
+.wap-admin-box li:last-child {
+    margin-bottom: 0;
+}
+
+.wap-admin-box a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.wap-admin-box a:hover {
+    color: #4f46e5;
+    text-decoration: underline;
+}
+
+/* Status Items */
+.wap-status-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.wap-status-item:last-child {
+    border-bottom: none;
+}
+
+.wap-status-label {
+    font-weight: 500;
+    color: #374151;
+}
+
+.wap-status-value {
+    font-size: 0.9rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.wap-status-value.enabled {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.wap-status-value.disabled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Upgrade Box */
+.wap-upgrade-box {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+}
+
+.wap-upgrade-box h3 {
+    color: white;
+}
+
+.wap-upgrade-box p {
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+}
+
+.wap-upgrade-box .button-primary {
+    background: white;
+    color: #6366f1;
+    border: none;
+    font-weight: 600;
+}
+
+.wap-upgrade-box .button-primary:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+}
+
+/* Modal Styles */
+.wap-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wap-modal-content {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.wap-modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wap-modal-header h3 {
+    margin: 0;
+    font-size: 1.4rem;
+    color: #1f2937;
+}
+
+.wap-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.wap-modal-close:hover {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.wap-modal-body {
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: 60vh;
+}
+
+/* Loading States */
+.wap-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wap-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: wap-spin 1s linear infinite;
+}
+
+@keyframes wap-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success/Error Messages */
+.wap-notice {
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.wap-notice-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.wap-notice-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.wap-notice-warning {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.wap-notice-info {
+    background: #dbeafe;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+/* Analytics Styles */
+.wap-analytics-overview {
+    padding: 2rem;
+}
+
+.wap-analytics-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.wap-analytics-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    text-align: center;
+}
+
+.wap-analytics-card h3 {
+    margin: 0 0 1rem 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.wap-analytics-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #6366f1;
+}
+
+.wap-table-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.wap-no-data {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: #6b7280;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .wap-admin-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .wap-admin-sidebar {
+        grid-row: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .wap-admin-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+    
+    .wap-admin-header-stats {
+        gap: 1rem;
+    }
+    
+    .wap-form-field {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .wap-form-field label {
+        padding-top: 0;
+    }
+    
+    .wap-tab-nav {
+        flex-wrap: wrap;
+    }
+    
+    .wap-tab-button {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    .wap-form-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .wap-form-actions .button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .wap-admin-header {
+        padding: 1.5rem;
+    }
+    
+    .wap-admin-header-stats {
+        flex-direction: column;
+        width: 100%;
+        gap: 1rem;
+    }
+    
+    .wap-tab-content {
+        padding: 1rem;
+    }
+    
+    .wap-modal-content {
+        width: 95%;
+    }
+    
+    .wap-modal-header,
+    .wap-modal-body {
+        padding: 1rem 1.5rem;
+    }
+}
