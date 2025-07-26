@@ -15,6 +15,7 @@
             this.initTabs();
             this.initFormHandling();
             this.initResetButton();
+            this.initCustomTabs();
         }
 
         /**
@@ -196,6 +197,264 @@
                 $button.css('opacity', '1');
             }
         }
+        
+        
+        
+        /**
+         * Initialize custom tabs functionality
+         */
+        initCustomTabs() {
+            
+    // Check if we're on a page with custom tabs functionality
+    if (!document.querySelector('#wap-add-custom-tab')) {
+        console.log('Custom tabs elements not found, skipping initialization');
+        return;
+    }            
+            
+            
+            // Only initialize if we're on the custom tabs section
+            if (!$('#wap-add-custom-tab').length) {
+                return; // Exit if custom tabs elements aren't present
+            }
+
+            // Add new tab button
+            $('#wap-add-custom-tab').on('click', () => {
+                this.openTabEditor();
+            });
+
+            // Edit tab buttons (use delegated events for dynamic content)
+            $(document).on('click', '.wap-edit-tab', (e) => {
+                const tabId = $(e.currentTarget).data('tab-id');
+                this.openTabEditor(tabId);
+            });
+
+            // Delete tab buttons (use delegated events)
+            $(document).on('click', '.wap-delete-tab', (e) => {
+                const tabId = $(e.currentTarget).data('tab-id');
+                this.deleteCustomTab(tabId);
+            });
+
+            // Modal close buttons
+            $(document).on('click', '.wap-modal-close', () => {
+                this.closeTabEditor();
+            });
+
+            // Save tab button
+            $(document).on('click', '#wap-save-custom-tab', () => {
+                this.saveCustomTab();
+            });
+
+            // Close modal on outside click
+            $(document).on('click', '#wap-tab-editor-modal', (e) => {
+                if (e.target.id === 'wap-tab-editor-modal') {
+                    this.closeTabEditor();
+                }
+            });
+
+            // Close modal on Escape key
+            $(document).on('keydown', (e) => {
+                if (e.key === 'Escape' && $('#wap-tab-editor-modal').is(':visible')) {
+                    this.closeTabEditor();
+                }
+            });
+        }
+
+        /**
+         * Open tab editor modal
+         */
+        openTabEditor(tabId = null) {
+            const $modal = $('#wap-tab-editor-modal');
+            const $form = $('#wap-custom-tab-form');
+            
+            // Check if modal exists
+            if (!$modal.length) {
+                console.error('Custom tab modal not found in DOM');
+                return;
+            }
+            
+            // Check if form exists
+            if (!$form.length) {
+                console.error('Custom tab form not found in DOM');
+                return;
+            }
+            
+            // Reset form
+            $form[0].reset();
+            $('#wap-tab-id').val('');
+            $('.wap-modal-message').hide();
+
+            if (tabId) {
+                // Edit existing tab
+                $('#wap-modal-title').text('Edit Custom Tab');
+                this.loadTabData(tabId);
+            } else {
+                // Add new tab
+                $('#wap-modal-title').text('Add New Tab');
+                $('#wap-tab-priority').val(50);
+                $('#wap-tab-enabled').prop('checked', true);
+            }
+
+            $modal.show();
+            
+            // Focus on title field if it exists
+            setTimeout(() => {
+                $('#wap-tab-title').focus();
+            }, 100);
+        }
+
+        /**
+         * Close tab editor modal
+         */
+        closeTabEditor() {
+            $('#wap-tab-editor-modal').hide();
+        }
+
+        /**
+         * Load tab data for editing
+         */
+        loadTabData(tabId) {
+            this.setLoadingState($('#wap-save-custom-tab'), true);
+
+            $.post(this.settings.ajax_url, {
+                action: 'wap_get_custom_tab',
+                nonce: this.settings.nonce,
+                tab_id: tabId
+            })
+            .done((response) => {
+                this.setLoadingState($('#wap-save-custom-tab'), false);
+
+                if (response.success && response.data.tab_data) {
+                    const tabData = response.data.tab_data;
+                    
+                    $('#wap-tab-id').val(tabId);
+                    $('#wap-tab-title').val(tabData.title || '');
+                    $('#wap-tab-content').val(tabData.content || '');
+                    $('#wap-tab-priority').val(tabData.priority || 50);
+                    $('#wap-tab-enabled').prop('checked', tabData.enabled || false);
+
+                    // Set conditions
+                    if (tabData.conditions) {
+                        if (tabData.conditions.categories) {
+                            $('#wap-tab-categories').val(tabData.conditions.categories);
+                        }
+                        if (tabData.conditions.user_roles) {
+                            $('#wap-tab-user-roles').val(tabData.conditions.user_roles);
+                        }
+                        if (tabData.conditions.product_types) {
+                            $('#wap-tab-product-types').val(tabData.conditions.product_types);
+                        }
+                    }
+                } else {
+                    this.showModalMessage('error', response.data?.message || 'Failed to load tab data');
+                }
+            })
+            .fail(() => {
+                this.setLoadingState($('#wap-save-custom-tab'), false);
+                this.showModalMessage('error', 'Network error occurred');
+            });
+        }
+
+        /**
+         * Save custom tab
+         */
+        saveCustomTab() {
+            const $form = $('#wap-custom-tab-form');
+            const $saveButton = $('#wap-save-custom-tab');
+            
+            // Validate required fields
+            if (!$('#wap-tab-title').val().trim()) {
+                this.showModalMessage('error', 'Tab title is required');
+                $('#wap-tab-title').focus();
+                return;
+            }
+
+            this.setLoadingState($saveButton, true);
+            $('.wap-modal-message').hide();
+
+            // Serialize form data
+            const formData = $form.serialize();
+            const postData = formData + '&action=wap_save_custom_tab&nonce=' + this.settings.nonce;
+
+            $.post(this.settings.ajax_url, postData)
+                .done((response) => {
+                    this.setLoadingState($saveButton, false);
+
+                    if (response.success) {
+                        this.showModalMessage('success', response.data.message);
+                        
+                        // Close modal after short delay and reload page
+                        setTimeout(() => {
+                            this.closeTabEditor();
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        this.showModalMessage('error', response.data?.message || 'Failed to save tab');
+                    }
+                })
+                .fail(() => {
+                    this.setLoadingState($saveButton, false);
+                    this.showModalMessage('error', 'Network error occurred');
+                });
+        }
+
+        /**
+         * Delete custom tab
+         */
+        deleteCustomTab(tabId) {
+            if (!confirm('Are you sure you want to delete this custom tab? This action cannot be undone.')) {
+                return;
+            }
+
+            const $tabRow = $(`.wap-tab-row[data-tab-id="${tabId}"]`);
+            $tabRow.addClass('wap-tabs-loading');
+
+            $.post(this.settings.ajax_url, {
+                action: 'wap_delete_custom_tab',
+                nonce: this.settings.nonce,
+                tab_id: tabId
+            })
+            .done((response) => {
+                if (response.success) {
+                    $tabRow.fadeOut(() => {
+                        $tabRow.remove();
+                        
+                        // Show no tabs message if no tabs remain
+                        if ($('.wap-tab-row').length === 0) {
+                            $('.wap-tabs-table').hide();
+                            $('.wap-no-tabs-message').show();
+                        }
+                    });
+                    
+                    this.showNotice('success', response.data.message);
+                } else {
+                    $tabRow.removeClass('wap-tabs-loading');
+                    this.showNotice('error', response.data?.message || 'Failed to delete tab');
+                }
+            })
+            .fail(() => {
+                $tabRow.removeClass('wap-tabs-loading');
+                this.showNotice('error', 'Network error occurred');
+            });
+        }
+
+        /**
+         * Show message in modal
+         */
+        showModalMessage(type, message) {
+            const $message = $('.wap-modal-message');
+            $message.removeClass('success error').addClass(type);
+            $message.text(message).show();
+            
+            // Auto-hide error messages
+            if (type === 'error') {
+                setTimeout(() => {
+                    $message.fadeOut();
+                }, 5000);
+            }
+        }        
+        
+        
+        
     }
 
     // Initialize when document is ready

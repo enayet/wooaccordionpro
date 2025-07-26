@@ -1,8 +1,8 @@
 <?php
 /**
- * WooAccordion Pro Settings Class
+ * WooAccordion Pro Settings Class - Complete with Custom Tabs
  * 
- * Premium admin settings with clean UI/UX
+ * Premium admin settings with clean UI/UX and custom tabs functionality
  */
 
 if (!defined('ABSPATH')) {
@@ -17,30 +17,6 @@ class WAP_Settings {
         if (is_null(self::$_instance)) {
             self::$_instance = new self();
         }
-    }
-    /**
-     * Save settings (traditional form submission)
-     */
-    private function save_settings() {
-        $settings = array(
-            'wap_enable_accordion' => isset($_POST['wap_enable_accordion']) ? 'yes' : 'no',
-            'wap_auto_expand_first' => isset($_POST['wap_auto_expand_first']) ? 'yes' : 'no',
-            'wap_allow_multiple_open' => isset($_POST['wap_allow_multiple_open']) ? 'yes' : 'no',
-            'wap_show_icons' => isset($_POST['wap_show_icons']) ? 'yes' : 'no',
-            'wap_enable_mobile_gestures' => isset($_POST['wap_enable_mobile_gestures']) ? 'yes' : 'no',
-            'wap_template' => sanitize_text_field($_POST['wap_template'] ?? 'modern'),
-            'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library'] ?? 'css'),
-            'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration'] ?? '300'),
-            'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
-            'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
-            'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
-            'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
-        );
-
-        foreach ($settings as $key => $value) {
-            update_option($key, $value);
-        }
-    
         return self::$_instance;
     }
 
@@ -49,6 +25,19 @@ class WAP_Settings {
         add_action('admin_init', array($this, 'admin_init'));
         add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
         add_action('wp_ajax_wap_save_settings', array($this, 'ajax_save_settings'));
+        
+        // Ensure custom tabs manager is loaded
+        add_action('init', array($this, 'ensure_custom_tabs_loaded'));
+    }
+
+    /**
+     * Ensure custom tabs manager is loaded
+     */
+    public function ensure_custom_tabs_loaded() {
+        if (!class_exists('WAP_Custom_Tabs')) {
+            include_once WAP_PLUGIN_PATH . 'includes/class-wap-custom-tabs.php';
+            WAP_Custom_Tabs::instance();
+        }
     }
 
     /**
@@ -115,6 +104,30 @@ class WAP_Settings {
     }
 
     /**
+     * Save settings (traditional form submission)
+     */
+    private function save_settings() {
+        $settings = array(
+            'wap_enable_accordion' => isset($_POST['wap_enable_accordion']) ? 'yes' : 'no',
+            'wap_auto_expand_first' => isset($_POST['wap_auto_expand_first']) ? 'yes' : 'no',
+            'wap_allow_multiple_open' => isset($_POST['wap_allow_multiple_open']) ? 'yes' : 'no',
+            'wap_show_icons' => isset($_POST['wap_show_icons']) ? 'yes' : 'no',
+            'wap_enable_mobile_gestures' => isset($_POST['wap_enable_mobile_gestures']) ? 'yes' : 'no',
+            'wap_template' => sanitize_text_field($_POST['wap_template'] ?? 'modern'),
+            'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library'] ?? 'css'),
+            'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration'] ?? '300'),
+            'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
+            'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
+            'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
+            'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
+        );
+
+        foreach ($settings as $key => $value) {
+            update_option($key, $value);
+        }
+    }
+
+    /**
      * Premium admin page with tabbed interface
      */
     public function admin_page() {
@@ -157,6 +170,9 @@ class WAP_Settings {
                                 </button>
                                 <button type="button" class="wap-tab-button" data-tab="mobile">
                                     <?php _e('Mobile', 'wooaccordion-pro'); ?>
+                                </button>
+                                <button type="button" class="wap-tab-button" data-tab="custom-tabs">
+                                    <?php _e('Custom Tabs', 'wooaccordion-pro'); ?>
                                 </button>
                             </nav>
 
@@ -296,6 +312,9 @@ class WAP_Settings {
                                         </ul>
                                     </div>
                                 </div>
+
+                                <!-- Custom Tabs Tab -->
+                                <?php $this->render_custom_tabs_panel(); ?>
                             </div>
                         </div>
                         
@@ -322,9 +341,12 @@ class WAP_Settings {
                             <span class="wap-status-value"><?php echo esc_html(ucfirst(get_option('wap_template', 'modern'))); ?></span>
                         </div>
                         <div class="wap-status-item">
-                            <span class="wap-status-label"><?php _e('Mobile Gestures:', 'wooaccordion-pro'); ?></span>
-                            <span class="wap-status-value <?php echo get_option('wap_enable_mobile_gestures', 'yes') === 'yes' ? 'enabled' : 'disabled'; ?>">
-                                <?php echo get_option('wap_enable_mobile_gestures', 'yes') === 'yes' ? __('Enabled', 'wooaccordion-pro') : __('Disabled', 'wooaccordion-pro'); ?>
+                            <span class="wap-status-label"><?php _e('Custom Tabs:', 'wooaccordion-pro'); ?></span>
+                            <span class="wap-status-value">
+                                <?php 
+                                $custom_tabs = get_option('wap_custom_tabs', array());
+                                echo count($custom_tabs) . ' ' . __('tabs', 'wooaccordion-pro');
+                                ?>
                             </span>
                         </div>
                     </div>
@@ -347,8 +369,254 @@ class WAP_Settings {
                     </div>
                 </div>
             </div>
+
+            <!-- Custom Tab Editor Modal -->
+            <?php $this->render_custom_tab_modal(); ?>
         </div>
         <?php
+    }
+
+    /**
+     * Render custom tabs panel
+     */
+    private function render_custom_tabs_panel() {
+        // Ensure custom tabs manager is available
+        if (!class_exists('WAP_Custom_Tabs')) {
+            $this->ensure_custom_tabs_loaded();
+        }
+        
+        $custom_tabs_manager = WAP_Custom_Tabs::instance();
+        $custom_tabs = $custom_tabs_manager->get_custom_tabs();
+        ?>
+        <div class="wap-tab-panel" data-panel="custom-tabs">
+            <h3><?php _e('Custom Tabs Manager', 'wooaccordion-pro'); ?></h3>
+            <p><?php _e('Create custom accordion tabs with conditional display logic.', 'wooaccordion-pro'); ?></p>
+
+            <div class="wap-custom-tabs-header">
+                <button type="button" class="button button-primary" id="wap-add-custom-tab">
+                    <?php _e('Add New Tab', 'wooaccordion-pro'); ?>
+                </button>
+            </div>
+
+            <div class="wap-custom-tabs-list">
+                <?php if (empty($custom_tabs)) : ?>
+                    <div class="wap-no-tabs-message">
+                        <p><?php _e('No custom tabs created yet. Click "Add New Tab" to get started.', 'wooaccordion-pro'); ?></p>
+                    </div>
+                <?php else : ?>
+                    <div class="wap-tabs-table">
+                        <div class="wap-tabs-header">
+                            <div class="wap-col-title"><?php _e('Tab Title', 'wooaccordion-pro'); ?></div>
+                            <div class="wap-col-conditions"><?php _e('Conditions', 'wooaccordion-pro'); ?></div>
+                            <div class="wap-col-priority"><?php _e('Priority', 'wooaccordion-pro'); ?></div>
+                            <div class="wap-col-status"><?php _e('Status', 'wooaccordion-pro'); ?></div>
+                            <div class="wap-col-actions"><?php _e('Actions', 'wooaccordion-pro'); ?></div>
+                        </div>
+                        
+                        <?php foreach ($custom_tabs as $tab_id => $tab_data) : ?>
+                            <div class="wap-tab-row" data-tab-id="<?php echo esc_attr($tab_id); ?>">
+                                <div class="wap-col-title">
+                                    <strong><?php echo esc_html($tab_data['title']); ?></strong>
+                                </div>
+                                <div class="wap-col-conditions">
+                                    <?php echo $this->format_tab_conditions($tab_data['conditions'] ?? array()); ?>
+                                </div>
+                                <div class="wap-col-priority">
+                                    <?php echo esc_html($tab_data['priority'] ?? 50); ?>
+                                </div>
+                                <div class="wap-col-status">
+                                    <span class="wap-status-badge <?php echo !empty($tab_data['enabled']) ? 'enabled' : 'disabled'; ?>">
+                                        <?php echo !empty($tab_data['enabled']) ? __('Enabled', 'wooaccordion-pro') : __('Disabled', 'wooaccordion-pro'); ?>
+                                    </span>
+                                </div>
+                                <div class="wap-col-actions">
+                                    <button type="button" class="button button-small wap-edit-tab" data-tab-id="<?php echo esc_attr($tab_id); ?>">
+                                        <?php _e('Edit', 'wooaccordion-pro'); ?>
+                                    </button>
+                                    <button type="button" class="button button-small button-link-delete wap-delete-tab" data-tab-id="<?php echo esc_attr($tab_id); ?>">
+                                        <?php _e('Delete', 'wooaccordion-pro'); ?>
+                                    </button>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render custom tab editor modal
+     */
+    private function render_custom_tab_modal() {
+        // Ensure custom tabs manager is available
+        if (!class_exists('WAP_Custom_Tabs')) {
+            $this->ensure_custom_tabs_loaded();
+        }
+        
+        $custom_tabs_manager = WAP_Custom_Tabs::instance();
+        ?>
+        <div id="wap-tab-editor-modal" class="wap-modal" style="display: none;">
+            <div class="wap-modal-content">
+                <div class="wap-modal-header">
+                    <h3 id="wap-modal-title"><?php _e('Add New Tab', 'wooaccordion-pro'); ?></h3>
+                    <button type="button" class="wap-modal-close">&times;</button>
+                </div>
+                
+                <div class="wap-modal-body">
+                    <div class="wap-modal-message" style="display: none;"></div>
+                    
+                    <form id="wap-custom-tab-form">
+                        <input type="hidden" id="wap-tab-id" name="tab_id" value="">
+                        
+                        <div class="wap-form-section">
+                            <h4><?php _e('Basic Information', 'wooaccordion-pro'); ?></h4>
+                            
+                            <div class="wap-form-field">
+                                <label for="wap-tab-title"><?php _e('Tab Title', 'wooaccordion-pro'); ?></label>
+                                <input type="text" id="wap-tab-title" name="tab_data[title]" required />
+                                <p class="description"><?php _e('The title that appears in the accordion header', 'wooaccordion-pro'); ?></p>
+                            </div>
+
+                            <div class="wap-form-field">
+                                <label for="wap-tab-priority"><?php _e('Priority', 'wooaccordion-pro'); ?></label>
+                                <input type="number" id="wap-tab-priority" name="tab_data[priority]" value="50" min="1" max="100" />
+                                <p class="description"><?php _e('Lower numbers appear first (1-100)', 'wooaccordion-pro'); ?></p>
+                            </div>
+
+                            <div class="wap-form-field">
+                                <label for="wap-tab-enabled"><?php _e('Status', 'wooaccordion-pro'); ?></label>
+                                <input type="checkbox" id="wap-tab-enabled" name="tab_data[enabled]" value="1" checked />
+                                <span><?php _e('Enable this tab', 'wooaccordion-pro'); ?></span>
+                            </div>
+                        </div>
+
+                        <div class="wap-form-section">
+                            <h4><?php _e('Tab Content', 'wooaccordion-pro'); ?></h4>
+                            
+                            <div class="wap-form-field">
+                                <label for="wap-tab-content"><?php _e('Content', 'wooaccordion-pro'); ?></label>
+                                <textarea id="wap-tab-content" name="tab_data[content]" rows="8"></textarea>
+                                <p class="description">
+                                    <?php _e('Tab content. You can use HTML and the following placeholders:', 'wooaccordion-pro'); ?>
+                                    <br>
+                                    <code>{product_name}</code>, <code>{product_price}</code>, <code>{product_sku}</code>, 
+                                    <code>{product_weight}</code>, <code>{product_dimensions}</code>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="wap-form-section">
+                            <h4><?php _e('Display Conditions', 'wooaccordion-pro'); ?></h4>
+                            <p class="description"><?php _e('Leave empty to show on all products. Add conditions to show only on specific products.', 'wooaccordion-pro'); ?></p>
+                            
+                            <div class="wap-form-field">
+                                <label for="wap-tab-categories"><?php _e('Product Categories', 'wooaccordion-pro'); ?></label>
+                                <select id="wap-tab-categories" name="tab_data[conditions][categories][]" multiple>
+                                    <?php
+                                    $categories = $custom_tabs_manager->get_product_categories();
+                                    foreach ($categories as $id => $name) :
+                                    ?>
+                                        <option value="<?php echo esc_attr($id); ?>"><?php echo esc_html($name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description"><?php _e('Show tab only for products in these categories', 'wooaccordion-pro'); ?></p>
+                            </div>
+
+                            <div class="wap-form-field">
+                                <label for="wap-tab-user-roles"><?php _e('User Roles', 'wooaccordion-pro'); ?></label>
+                                <select id="wap-tab-user-roles" name="tab_data[conditions][user_roles][]" multiple>
+                                    <?php
+                                    $user_roles = $custom_tabs_manager->get_user_roles();
+                                    foreach ($user_roles as $role_key => $role_name) :
+                                    ?>
+                                        <option value="<?php echo esc_attr($role_key); ?>"><?php echo esc_html($role_name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description"><?php _e('Show tab only for users with these roles', 'wooaccordion-pro'); ?></p>
+                            </div>
+
+                            <div class="wap-form-field">
+                                <label for="wap-tab-product-types"><?php _e('Product Types', 'wooaccordion-pro'); ?></label>
+                                <select id="wap-tab-product-types" name="tab_data[conditions][product_types][]" multiple>
+                                    <?php
+                                    $product_types = $custom_tabs_manager->get_product_types();
+                                    foreach ($product_types as $type_key => $type_name) :
+                                    ?>
+                                        <option value="<?php echo esc_attr($type_key); ?>"><?php echo esc_html($type_name); ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <p class="description"><?php _e('Show tab only for these product types', 'wooaccordion-pro'); ?></p>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="wap-modal-footer">
+                    <button type="button" class="button button-secondary wap-modal-close">
+                        <?php _e('Cancel', 'wooaccordion-pro'); ?>
+                    </button>
+                    <button type="button" class="button button-primary" id="wap-save-custom-tab">
+                        <?php _e('Save Tab', 'wooaccordion-pro'); ?>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Format tab conditions for display
+     */
+    private function format_tab_conditions($conditions) {
+        $formatted = array();
+        
+        if (!empty($conditions['categories'])) {
+            $category_names = array();
+            foreach ($conditions['categories'] as $cat_id) {
+                $term = get_term($cat_id, 'product_cat');
+                if ($term && !is_wp_error($term)) {
+                    $category_names[] = $term->name;
+                }
+            }
+            if (!empty($category_names)) {
+                $formatted[] = __('Categories: ', 'wooaccordion-pro') . implode(', ', $category_names);
+            }
+        }
+        
+        if (!empty($conditions['user_roles'])) {
+            global $wp_roles;
+            $role_names = array();
+            foreach ($conditions['user_roles'] as $role_key) {
+                if (isset($wp_roles->roles[$role_key])) {
+                    $role_names[] = $wp_roles->roles[$role_key]['name'];
+                }
+            }
+            if (!empty($role_names)) {
+                $formatted[] = __('Roles: ', 'wooaccordion-pro') . implode(', ', $role_names);
+            }
+        }
+        
+        if (!empty($conditions['product_types'])) {
+            $type_labels = array(
+                'simple' => __('Simple', 'wooaccordion-pro'),
+                'grouped' => __('Grouped', 'wooaccordion-pro'),
+                'external' => __('External', 'wooaccordion-pro'),
+                'variable' => __('Variable', 'wooaccordion-pro'),
+            );
+            $type_names = array();
+            foreach ($conditions['product_types'] as $type) {
+                if (isset($type_labels[$type])) {
+                    $type_names[] = $type_labels[$type];
+                }
+            }
+            if (!empty($type_names)) {
+                $formatted[] = __('Types: ', 'wooaccordion-pro') . implode(', ', $type_names);
+            }
+        }
+        
+        return !empty($formatted) ? implode('<br>', $formatted) : __('All products', 'wooaccordion-pro');
     }
 
     /**

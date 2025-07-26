@@ -86,12 +86,14 @@ final class WooAccordionPro {
     public function includes() {
         include_once WAP_PLUGIN_PATH . 'includes/class-wap-settings.php';
         include_once WAP_PLUGIN_PATH . 'includes/class-wap-frontend.php';
+        include_once WAP_PLUGIN_PATH . 'includes/class-wap-custom-tabs.php';
 
         // Initialize classes
         if (is_admin()) {
             WAP_Settings::instance();
         }
         WAP_Frontend::instance();
+        WAP_Custom_Tabs::instance();
     }
 
     /**

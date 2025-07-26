@@ -54,6 +54,9 @@ class WAP_Frontend {
             return $tabs;
         }
 
+        // Add custom tabs to the existing tabs
+        $tabs = $this->add_custom_tabs_to_product_tabs($tabs);
+
         // Store tabs for accordion conversion
         global $wap_accordion_tabs;
         $wap_accordion_tabs = $tabs;
@@ -214,4 +217,150 @@ class WAP_Frontend {
             return isset($icons[$section]) ? $icons[$section] : '<span class="wap-css-icon wap-icon-file"></span>';
         }
     }
+    
+    
+  
+    
+    
+    /**
+     * Add custom tabs to product tabs
+     */
+    private function add_custom_tabs_to_product_tabs($tabs) {
+        global $product;
+        
+        if (!$product || !class_exists('WAP_Custom_Tabs')) {
+            return $tabs;
+        }
+
+        $custom_tabs_manager = WAP_Custom_Tabs::instance();
+        $custom_tabs = $custom_tabs_manager->get_custom_tabs();
+        
+        foreach ($custom_tabs as $tab_id => $tab_data) {
+            // Check if tab should be displayed for this product
+            if ($this->should_display_custom_tab($tab_data, $product)) {
+                $tabs['custom_' . $tab_id] = array(
+                    'title' => $tab_data['title'],
+                    'priority' => isset($tab_data['priority']) ? $tab_data['priority'] : 50,
+                    'callback' => array($this, 'custom_tab_content'),
+                    'tab_data' => $tab_data
+                );
+            }
+        }
+
+        return $tabs;
+    }    
+    
+    
+    /**
+     * Check if custom tab should be displayed
+     */
+    private function should_display_custom_tab($tab_data, $product) {
+        // Check if tab is enabled
+        if (empty($tab_data['enabled'])) {
+            return false;
+        }
+
+        // Check category conditions
+        if (!empty($tab_data['conditions']['categories'])) {
+            $product_categories = wp_get_post_terms($product->get_id(), 'product_cat', array('fields' => 'ids'));
+            $allowed_categories = array_map('intval', $tab_data['conditions']['categories']);
+            
+            // If no category matches, hide tab
+            if (empty(array_intersect($product_categories, $allowed_categories))) {
+                return false;
+            }
+        }
+
+        // Check user role conditions
+        if (!empty($tab_data['conditions']['user_roles'])) {
+            $current_user = wp_get_current_user();
+            $user_roles = (array) $current_user->roles;
+            $allowed_roles = $tab_data['conditions']['user_roles'];
+            
+            // If user has no allowed role, hide tab
+            if (empty(array_intersect($user_roles, $allowed_roles))) {
+                return false;
+            }
+        }
+
+        // Check product type conditions
+        if (!empty($tab_data['conditions']['product_types'])) {
+            $product_type = $product->get_type();
+            $allowed_types = $tab_data['conditions']['product_types'];
+            
+            if (!in_array($product_type, $allowed_types)) {
+                return false;
+            }
+        }
+
+        return true;
+    }    
+    
+    /**
+     * Output custom tab content
+     */
+    public function custom_tab_content($key, $tab) {
+        if (!isset($tab['tab_data'])) {
+            return;
+        }
+
+        $tab_data = $tab['tab_data'];
+        
+        // Process dynamic content
+        $content = $this->process_dynamic_content($tab_data['content']);
+        
+        echo '<div class="wap-custom-tab-content">';
+        echo wp_kses_post($content);
+        echo '</div>';
+    }
+    
+    
+    /**
+     * Process dynamic content (shortcodes, placeholders)
+     */
+    private function process_dynamic_content($content) {
+        global $product;
+        
+        if (!$product) {
+            return $content;
+        }
+        
+        // Replace product placeholders
+        $placeholders = array(
+            '{product_name}' => $product->get_name(),
+            '{product_price}' => $product->get_price_html(),
+            '{product_sku}' => $product->get_sku(),
+            '{product_weight}' => $product->get_weight(),
+            '{product_dimensions}' => $this->get_product_dimensions($product),
+        );
+
+        $content = str_replace(array_keys($placeholders), array_values($placeholders), $content);
+        
+        // Process shortcodes
+        $content = do_shortcode($content);
+        
+        return $content;
+    }
+    
+    /**
+     * Get formatted product dimensions
+     */
+    private function get_product_dimensions($product) {
+        $dimensions = array(
+            'length' => $product->get_length(),
+            'width' => $product->get_width(),
+            'height' => $product->get_height()
+        );
+        
+        $dimensions = array_filter($dimensions);
+        
+        if (empty($dimensions)) {
+            return '';
+        }
+        
+        return implode(' × ', $dimensions) . ' ' . get_option('woocommerce_dimension_unit');
+    }    
+    
+    
+    
 }

@@ -492,3 +492,349 @@
         padding: 1rem;
     }
 }
+
+
+
+
+
+/* Custom Tabs Management */
+.wap-custom-tabs-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.wap-no-tabs-message {
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #6b7280;
+}
+
+.wap-tabs-table {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.wap-tabs-header {
+    display: grid;
+    grid-template-columns: 2fr 2fr 80px 100px 120px;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid var(--border);
+}
+
+.wap-tab-row {
+    display: grid;
+    grid-template-columns: 2fr 2fr 80px 100px 120px;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.wap-tab-row:hover {
+    background: #f9fafb;
+}
+
+.wap-tab-row:last-child {
+    border-bottom: none;
+}
+
+.wap-col-title strong {
+    color: #1f2937;
+}
+
+.wap-col-conditions {
+    font-size: 0.9rem;
+    color: #6b7280;
+    line-height: 1.4;
+}
+
+.wap-status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.wap-status-badge.enabled {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.wap-status-badge.disabled {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.wap-col-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.wap-col-actions .button {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+}
+
+/* Modal Styles */
+.wap-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wap-modal-content {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.wap-modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.wap-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #1f2937;
+}
+
+.wap-modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.wap-modal-close:hover {
+    color: #374151;
+}
+
+.wap-modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.wap-modal-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+/* Form Sections in Modal */
+.wap-form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.wap-form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.wap-form-section h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+/* Multi-select styling */
+.wap-form-field select[multiple] {
+    min-height: 120px;
+    padding: 0.5rem;
+}
+
+.wap-form-field select[multiple] option {
+    padding: 0.25rem;
+}
+
+.wap-form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Responsive Modal */
+@media (max-width: 768px) {
+    .wap-modal-content {
+        width: 95%;
+        margin: 1rem;
+    }
+    
+    .wap-tabs-header,
+    .wap-tab-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .wap-tabs-header > div,
+    .wap-tab-row > div {
+        padding: 0.25rem 0;
+    }
+    
+    .wap-tabs-header {
+        display: none; /* Hide header on mobile for cleaner look */
+    }
+    
+    .wap-tab-row {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+    
+    .wap-col-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .wap-col-conditions:before {
+        content: "Conditions: ";
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .wap-col-priority:before {
+        content: "Priority: ";
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .wap-col-status {
+        margin: 0.5rem 0;
+    }
+    
+    .wap-col-actions {
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid #f3f4f6;
+    }
+    
+    .wap-modal-footer {
+        flex-direction: column;
+    }
+    
+    .wap-modal-footer .button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Loading states for custom tabs */
+.wap-tabs-loading {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.wap-tabs-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid #e5e7eb;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: wap-spin 1s linear infinite;
+}
+
+/* Success/Error messages in modal */
+.wap-modal-message {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    display: none;
+}
+
+.wap-modal-message.success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.wap-modal-message.error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+/* Custom tabs preview */
+.wap-tabs-preview {
+    background: #f8f9fa;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.wap-tabs-preview h5 {
+    margin: 0 0 0.5rem 0;
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.wap-tabs-preview code {
+    background: white;
+    padding: 0.125rem 0.25rem;
+    border-radius: 3px;
+    border: 1px solid #e5e7eb;
+    font-size: 0.85em;
+    margin: 0 0.25rem;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .wap-admin-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .wap-admin-sidebar {
+        grid-row: 1;
+    }
+}
