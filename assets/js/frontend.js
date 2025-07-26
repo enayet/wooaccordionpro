@@ -10,39 +10,162 @@
      * Main WooAccordion Pro Class
      */
     class WooAccordionPro {
+        
         constructor() {
             this.settings = wap_frontend.settings || {};
             this.accordionContainer = null;
             this.touchStartY = 0;
             this.touchEndY = 0;
             this.isAnimating = false;
-            
+            //this.timeTracking = {};
+
             this.init();
-        }
+        }        
 
         /**
          * Initialize the accordion
          */
         init() {
             this.accordionContainer = document.querySelector('.wap-accordion');
-            
+
             if (!this.accordionContainer) {
                 return;
             }
 
+            // Apply settings to accordion
+            this.applyAccordionSettings();
             this.setupEventListeners();
-            this.setupTouchGestures();
-            this.setupAnalytics();
+
+            if (this.settings.enable_touch_gestures === 'yes') {
+                this.setupTouchGestures();
+            }
+
+            if (this.settings.enable_analytics === 'yes') {
+                this.setupAnalytics();
+            }
+
             this.setupAccessibility();
-            
+
             // Auto-expand first accordion if enabled
             if (this.settings.auto_expand_first === 'yes') {
                 this.autoExpandFirst();
             }
 
+            // Apply stagger animation if enabled
+            if (this.settings.enable_stagger === 'yes') {
+                this.applyStaggerAnimation();
+            }
+
             // Trigger ready event
             this.triggerEvent('wap:ready');
         }
+        
+        
+        /**
+         * Apply accordion settings
+         */
+        applyAccordionSettings() {
+            // Set data attributes
+            this.accordionContainer.setAttribute('data-animation', this.settings.animation_type);
+            this.accordionContainer.setAttribute('data-easing', this.settings.animation_easing);
+            this.accordionContainer.setAttribute('data-stagger', this.settings.enable_stagger);
+
+            // Apply CSS custom properties
+            this.accordionContainer.style.setProperty('--wap-animation-duration', this.settings.animation_duration + 'ms');
+            this.accordionContainer.style.setProperty('--wap-stagger-delay', this.settings.stagger_delay + 'ms');
+        }
+
+        /**
+         * Apply stagger animation
+         */
+        applyStaggerAnimation() {
+            const items = this.accordionContainer.querySelectorAll('.wap-accordion-item');
+            items.forEach((item, index) => {
+                item.style.animationDelay = (index * parseInt(this.settings.stagger_delay)) + 'ms';
+                item.classList.add('wap-stagger-item');
+            });
+        }        
+        
+        
+        /**
+         * Animate accordion open with proper easing
+         */
+        animateOpen(content, callback) {
+            const animationType = this.settings.animation_type || 'slide';
+            const duration = parseInt(this.settings.animation_duration) || 300;
+            const easing = this.settings.animation_easing || 'ease';
+
+            // Set CSS transition with proper easing
+            content.style.transition = `max-height ${duration}ms ${this.getCSSEasing(easing)}, opacity ${duration}ms ${this.getCSSEasing(easing)}`;
+
+            switch (animationType) {
+                case 'fade':
+                case 'fade-scale':
+                    this.animateFadeIn(content, duration, callback);
+                    break;
+                case 'bounce':
+                case 'elastic':
+                    this.animateBounceIn(content, duration, callback);
+                    break;
+                case 'slide-spring':
+                    content.style.transition = `max-height 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
+                    this.animateSlideDown(content, duration, callback);
+                    break;
+                case 'slide':
+                default:
+                    this.animateSlideDown(content, duration, callback);
+                    break;
+            }
+        }
+
+        /**
+         * Convert easing setting to CSS easing function
+         */
+        getCSSEasing(easing) {
+            const easingMap = {
+                'ease-in-out-back': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                'ease-in-out-circ': 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
+                'ease-in-out-expo': 'cubic-bezier(1, 0, 0, 1)',
+                'ease-in-out-sine': 'cubic-bezier(0.445, 0.05, 0.55, 0.95)',
+                'ease': 'ease'
+            };
+
+            return easingMap[easing] || 'ease';
+        }
+
+        /**
+         * Update toggle icon based on settings
+         */
+        updateToggleIcon(header, isOpen) {
+            const toggle = header.querySelector('.wap-accordion-toggle i');
+            if (!toggle) return;
+
+            const iconStyle = this.settings.toggle_icon_style || 'plus-minus';
+
+            switch (iconStyle) {
+                case 'chevron':
+                    toggle.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                    break;
+                case 'arrow':
+                    toggle.className = isOpen ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+                    break;
+                case 'caret':
+                    toggle.className = isOpen ? 'fas fa-caret-up' : 'fas fa-caret-down';
+                    break;
+                case 'custom':
+                    toggle.className = isOpen ? 
+                        this.settings.custom_toggle_expanded : 
+                        this.settings.custom_toggle_collapsed;
+                    break;
+                default: // plus-minus
+                    toggle.className = isOpen ? 'fas fa-minus' : 'fas fa-plus';
+                    break;
+            }
+        }        
+        
+        
+        
+        
 
         /**
          * Setup click event listeners

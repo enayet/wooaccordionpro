@@ -105,47 +105,124 @@
         /**
          * Handle form submission
          */
-        handleFormSubmit(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const formData = new FormData(form);
-            const submitButton = form.querySelector('input[type="submit"]');
-            
-            // Show loading state
-            this.setLoadingState(submitButton, true);
-            
-            // Convert FormData to URLSearchParams for AJAX
-            const params = new URLSearchParams();
-            for (let [key, value] of formData.entries()) {
-                params.append(key, value);
+handleFormSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitButton = form.querySelector('input[type="submit"]');
+    
+    // Show loading state
+    this.setLoadingState(submitButton, true);
+    
+    // Convert FormData to URLSearchParams for AJAX
+    const params = new URLSearchParams();
+    
+    // Handle all form fields including checkboxes
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            params.append(input.name, input.checked ? 'yes' : 'no');
+        } else if (input.type === 'radio') {
+            if (input.checked) {
+                params.append(input.name, input.value);
             }
-
-            // Add action for WordPress
-            params.append('action', 'wap_save_settings');
-            params.append('nonce', this.settings.nonce);
-
-            fetch(this.settings.ajax_url, {
-                method: 'POST',
-                body: params
-            })
-            .then(response => response.json())
-            .then(data => {
-                this.setLoadingState(submitButton, false);
-                
-                if (data.success) {
-                    this.showNotice('success', this.settings.strings.save_success);
-                    this.triggerEvent('wap:settings:saved', data);
-                } else {
-                    this.showNotice('error', data.message || this.settings.strings.save_error);
-                }
-            })
-            .catch(error => {
-                this.setLoadingState(submitButton, false);
-                this.showNotice('error', this.settings.strings.save_error);
-                console.error('WAPAdmin: Save error', error);
-            });
+        } else if (input.name) {
+            params.append(input.name, input.value);
         }
+    });
+
+    // Add action and nonce
+    params.append('action', 'wap_save_settings');
+    params.append('nonce', this.settings.nonce);
+
+    fetch(this.settings.ajax_url, {
+        method: 'POST',
+        body: params,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        this.setLoadingState(submitButton, false);
+        
+        if (data.success) {
+            this.showNotice('success', data.data.message || this.settings.strings.save_success);
+            this.triggerEvent('wap:settings:saved', data);
+            
+            // ADD THIS: Smooth scroll to top to show success message
+            this.scrollToTop();
+        } else {
+            this.showNotice('error', data.data.message || this.settings.strings.save_error);
+            // Also scroll to top for error messages
+            this.scrollToTop();
+        }
+    })
+    .catch(error => {
+        this.setLoadingState(submitButton, false);
+        console.error('WAPAdmin: Save error', error);
+        this.showNotice('error', this.settings.strings.save_error);
+        // Scroll to top for error messages too
+        this.scrollToTop();
+    });
+}
+        
+        
+        
+/**
+ * Smooth scroll to top of admin page
+ */
+scrollToTop() {
+    // Scroll to the top of the admin wrap
+    const adminWrap = document.querySelector('.wap-admin-wrap');
+    const targetElement = adminWrap || document.querySelector('#wpbody-content') || document.body;
+    
+    // Check if browser supports smooth scrolling
+    if ('scrollBehavior' in document.documentElement.style) {
+        targetElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+    } else {
+        // Fallback for older browsers with animated scroll
+        this.smoothScrollToElement(targetElement);
+    }
+}
+
+/**
+ * Fallback smooth scroll for older browsers
+ */
+smoothScrollToElement(element) {
+    const targetPosition = element.offsetTop;
+    const startPosition = window.pageYOffset;
+    const distance = targetPosition - startPosition;
+    const duration = 500; // 500ms
+    let start = null;
+
+    function animation(currentTime) {
+        if (start === null) start = currentTime;
+        const timeElapsed = currentTime - start;
+        const run = this.easeInOutQuad(timeElapsed, startPosition, distance, duration);
+        window.scrollTo(0, run);
+        if (timeElapsed < duration) requestAnimationFrame(animation);
+    }
+
+    // Easing function for smooth animation
+    this.easeInOutQuad = function(t, b, c, d) {
+        t /= d / 2;
+        if (t < 1) return c / 2 * t * t + b;
+        t--;
+        return -c / 2 * (t * (t - 2) - 1) + b;
+    };
+
+    requestAnimationFrame(animation.bind(this));
+}        
 
         /**
          * Handle color input changes

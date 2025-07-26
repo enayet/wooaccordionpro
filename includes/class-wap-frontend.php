@@ -53,13 +53,17 @@ class WAP_Frontend {
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         
         // Add accordion HTML output
-        add_action('woocommerce_output_product_data_tabs', array($this, 'output_accordion_html'));
+        add_action('woocommerce_after_single_product_summary', array($this, 'output_accordion_html'), 20);
         
         // Remove default tab styles
         add_action('wp_head', array($this, 'remove_default_tab_styles'));
         
         // Add custom accordion styles
         add_action('wp_head', array($this, 'add_custom_accordion_styles'));
+        
+    add_action('wp_ajax_wap_track_interaction', array('WAP_Frontend', 'handle_accordion_analytics'));
+    add_action('wp_ajax_nopriv_wap_track_interaction', array('WAP_Frontend', 'handle_accordion_analytics'));        
+        
     }
 
     /**
@@ -178,7 +182,77 @@ class WAP_Frontend {
                 'product_id' => get_the_ID()
             )
         ));
+        
+        
+        // Pass ALL settings to frontend
+        wp_localize_script('wap-frontend-js', 'wap_frontend', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('wap_frontend_nonce'),
+            'settings' => $this->get_all_frontend_settings()
+        ));        
+        
     }
+    
+    
+    /**
+     * Get all frontend settings
+     */
+    private function get_all_frontend_settings() {
+        return array(
+            // General Settings
+            'enable_accordion' => get_option('wap_enable_accordion', 'yes'),
+            'auto_expand_first' => get_option('wap_auto_expand_first', 'yes'),
+            'allow_multiple_open' => get_option('wap_allow_multiple_open', 'no'),
+            'show_icons' => get_option('wap_show_icons', 'yes'),
+            'icon_library' => get_option('wap_icon_library', 'fontawesome'),
+
+            // Styling Settings
+            'layout_template' => get_option('wap_layout_template', 'modern-card'),
+            'header_bg_color' => get_option('wap_header_bg_color', '#f8f9fa'),
+            'header_text_color' => get_option('wap_header_text_color', '#495057'),
+            'active_header_bg_color' => get_option('wap_active_header_bg_color', '#6366f1'),
+            'active_header_text_color' => get_option('wap_active_header_text_color', '#ffffff'),
+            'content_bg_color' => get_option('wap_content_bg_color', '#ffffff'),
+            'border_color' => get_option('wap_border_color', '#dee2e6'),
+            'header_hover_effect' => get_option('wap_header_hover_effect', 'none'),
+
+            // Animation Settings
+            'animation_type' => get_option('wap_animation_type', 'slide'),
+            'animation_duration' => get_option('wap_animation_duration', '300'),
+            'animation_easing' => get_option('wap_animation_easing', 'ease'),
+            'enable_stagger' => get_option('wap_enable_stagger', 'no'),
+            'stagger_delay' => get_option('wap_stagger_delay', '50'),
+            'toggle_icon_style' => get_option('wap_toggle_icon_style', 'plus-minus'),
+            'custom_toggle_collapsed' => get_option('wap_custom_toggle_collapsed', 'fas fa-plus'),
+            'custom_toggle_expanded' => get_option('wap_custom_toggle_expanded', 'fas fa-minus'),
+
+            // Mobile Settings
+            'enable_touch_gestures' => get_option('wap_enable_touch_gestures', 'yes'),
+            'sticky_navigation' => get_option('wap_sticky_navigation', 'no'),
+            'progressive_disclosure' => get_option('wap_progressive_disclosure', 'no'),
+            'mobile_breakpoint' => get_option('wap_mobile_breakpoint', '768'),
+
+            // Analytics
+            'enable_analytics' => get_option('wap_enable_analytics', 'yes'),
+            'track_scroll_depth' => get_option('wap_track_scroll_depth', 'no'),
+            'track_time_spent' => get_option('wap_track_time_spent', 'yes'),
+
+            // Performance
+            'hardware_acceleration' => get_option('wap_hardware_acceleration', 'yes'),
+            'lazy_load_content' => get_option('wap_lazy_load_content', 'no'),
+            'preload_first' => get_option('wap_preload_first', 'yes'),
+
+            // Accessibility
+            'keyboard_navigation' => get_option('wap_keyboard_navigation', 'yes'),
+            'focus_management' => get_option('wap_focus_management', 'yes'),
+            'high_contrast' => get_option('wap_high_contrast', 'no'),
+            'screen_reader_labels' => get_option('wap_screen_reader_labels', 'yes'),
+
+            // Product ID for analytics
+            'product_id' => get_the_ID()
+        );
+    }
+    
 
     /**
      * Output accordion HTML
@@ -190,11 +264,21 @@ class WAP_Frontend {
             return;
         }
 
-        $layout_template = get_option('wap_layout_template', 'modern-card');
-        $show_icons = get_option('wap_show_icons', 'yes') === 'yes';
+        $settings = $this->get_all_frontend_settings();
 
-        echo '<div class="wap-accordion-container wap-template-' . esc_attr($layout_template) . '">';
-        echo '<div class="wap-accordion" data-layout="' . esc_attr($layout_template) . '">';
+        // Build data attributes for JavaScript
+        $data_attributes = array(
+            'data-animation="' . esc_attr($settings['animation_type']) . '"',
+            'data-duration="' . esc_attr($settings['animation_duration']) . '"',
+            'data-easing="' . esc_attr($settings['animation_easing']) . '"',
+            'data-multiple="' . esc_attr($settings['allow_multiple_open']) . '"',
+            'data-auto-expand="' . esc_attr($settings['auto_expand_first']) . '"',
+            'data-stagger="' . esc_attr($settings['enable_stagger']) . '"',
+            'data-stagger-delay="' . esc_attr($settings['stagger_delay']) . '"'
+        );
+
+        echo '<div class="wap-accordion-container wap-template-' . esc_attr($settings['layout_template']) . '">';
+        echo '<div class="wap-accordion" ' . implode(' ', $data_attributes) . '>';
 
         $index = 0;
         foreach ($wap_accordion_tabs as $key => $tab) {
@@ -203,43 +287,65 @@ class WAP_Frontend {
             }
 
             $is_first = $index === 0;
-            $auto_expand = get_option('wap_auto_expand_first', 'yes') === 'yes' && $is_first;
+            $auto_expand = $settings['auto_expand_first'] === 'yes' && $is_first;
 
             echo '<div class="wap-accordion-item" data-section="' . esc_attr($key) . '">';
-            
-            // Accordion Header
+
+            // Accordion Header with proper toggle icons
             echo '<div class="wap-accordion-header' . ($auto_expand ? ' wap-active' : '') . '" data-target="' . esc_attr($key) . '">';
-            
-            if ($show_icons) {
+
+            if ($settings['show_icons'] === 'yes') {
                 $icon = $this->get_accordion_icon($key);
                 echo '<span class="wap-accordion-icon">' . $icon . '</span>';
             }
-            
+
             echo '<span class="wap-accordion-title">' . esc_html($tab['title']) . '</span>';
             echo '<span class="wap-accordion-toggle">';
-            echo $auto_expand ? $this->get_collapse_icon() : $this->get_expand_icon();
+            echo $auto_expand ? $this->get_toggle_icon(true, $settings) : $this->get_toggle_icon(false, $settings);
             echo '</span>';
             echo '</div>';
 
             // Accordion Content
             echo '<div class="wap-accordion-content' . ($auto_expand ? ' wap-active' : '') . '" id="wap-accordion-' . esc_attr($key) . '">';
             echo '<div class="wap-accordion-content-inner">';
-            
+
             // Get content from tab callback
             ob_start();
             call_user_func($tab['callback'], $key, $tab);
             $content = ob_get_clean();
-            
+
             echo $content;
             echo '</div>';
             echo '</div>';
-            
+
             echo '</div>';
             $index++;
         }
 
         echo '</div>';
         echo '</div>';
+    }
+
+    /**
+     * Get toggle icon based on settings
+     */
+    private function get_toggle_icon($is_expanded, $settings) {
+        $icon_style = $settings['toggle_icon_style'];
+
+        switch ($icon_style) {
+            case 'chevron':
+                return $is_expanded ? '<i class="fas fa-chevron-up"></i>' : '<i class="fas fa-chevron-down"></i>';
+            case 'arrow':
+                return $is_expanded ? '<i class="fas fa-arrow-up"></i>' : '<i class="fas fa-arrow-down"></i>';
+            case 'caret':
+                return $is_expanded ? '<i class="fas fa-caret-up"></i>' : '<i class="fas fa-caret-down"></i>';
+            case 'custom':
+                return $is_expanded ? 
+                    '<i class="' . esc_attr($settings['custom_toggle_expanded']) . '"></i>' : 
+                    '<i class="' . esc_attr($settings['custom_toggle_collapsed']) . '"></i>';
+            default: // plus-minus
+                return $is_expanded ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-plus"></i>';
+        }
     }
 
     /**
@@ -299,25 +405,63 @@ class WAP_Frontend {
             return;
         }
 
-        $header_bg = get_option('wap_header_bg_color', '#f8f9fa');
-        $header_text = get_option('wap_header_text_color', '#495057');
-        $active_header_bg = get_option('wap_active_header_bg_color', '#6366f1');
-        $active_header_text = get_option('wap_active_header_text_color', '#ffffff');
-        $content_bg = get_option('wap_content_bg_color', '#ffffff');
-        $border_color = get_option('wap_border_color', '#dee2e6');
-        $animation_duration = get_option('wap_animation_duration', '300');
+        $settings = $this->get_all_frontend_settings();
 
         echo '<style type="text/css">
             :root {
-                --wap-header-bg: ' . esc_attr($header_bg) . ';
-                --wap-header-text: ' . esc_attr($header_text) . ';
-                --wap-active-header-bg: ' . esc_attr($active_header_bg) . ';
-                --wap-active-header-text: ' . esc_attr($active_header_text) . ';
-                --wap-content-bg: ' . esc_attr($content_bg) . ';
-                --wap-border-color: ' . esc_attr($border_color) . ';
-                --wap-animation-duration: ' . esc_attr($animation_duration) . 'ms;
+                --wap-header-bg: ' . esc_attr($settings['header_bg_color']) . ';
+                --wap-header-text: ' . esc_attr($settings['header_text_color']) . ';
+                --wap-active-header-bg: ' . esc_attr($settings['active_header_bg_color']) . ';
+                --wap-active-header-text: ' . esc_attr($settings['active_header_text_color']) . ';
+                --wap-content-bg: ' . esc_attr($settings['content_bg_color']) . ';
+                --wap-border-color: ' . esc_attr($settings['border_color']) . ';
+                --wap-animation-duration: ' . esc_attr($settings['animation_duration']) . 'ms;
+                --wap-stagger-delay: ' . esc_attr($settings['stagger_delay']) . 'ms;
             }
+
+            /* Hardware acceleration */
+            ' . ($settings['hardware_acceleration'] === 'yes' ? '
+            .wap-accordion-content,
+            .wap-accordion-header {
+                will-change: transform, opacity;
+                transform: translateZ(0);
+            }' : '') . '
+
+            /* High contrast mode */
+            ' . ($settings['high_contrast'] === 'yes' ? '
+            .wap-accordion {
+                border: 2px solid #000;
+            }
+            .wap-accordion-header {
+                border-bottom: 1px solid #000;
+            }
+            .wap-accordion-header.wap-active {
+                background: #000 !important;
+                color: #fff !important;
+            }' : '') . '
+
+            /* Mobile breakpoint adjustments */
+            @media (max-width: ' . esc_attr($settings['mobile_breakpoint']) . 'px) {
+                .wap-accordion-header {
+                    min-height: 60px;
+                    padding: 1.25rem 1rem;
+                }
+            }
+
+            /* Sticky navigation */
+            ' . ($settings['sticky_navigation'] === 'yes' ? '
+            .wap-accordion-header.wap-active {
+                position: sticky;
+                top: 0;
+                z-index: 100;
+            }' : '') . '
         </style>';
+
+        // Add custom CSS if provided
+        $custom_css = get_option('wap_custom_css', '');
+        if (!empty($custom_css)) {
+            echo '<style type="text/css">' . wp_strip_all_tags($custom_css) . '</style>';
+        }
     }
 
     /**
@@ -337,7 +481,3 @@ class WAP_Frontend {
         wp_die();
     }
 }
-
-// Initialize AJAX handlers
-add_action('wp_ajax_wap_track_interaction', array('WAP_Frontend', 'handle_accordion_analytics'));
-add_action('wp_ajax_nopriv_wap_track_interaction', array('WAP_Frontend', 'handle_accordion_analytics'));

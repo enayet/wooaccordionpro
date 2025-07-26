@@ -53,6 +53,13 @@ class WAP_Settings {
         add_action('woocommerce_settings_tabs_accordions', array($this, 'settings_tab'));
         add_action('woocommerce_update_options_accordions', array($this, 'update_settings'));
         add_action('admin_enqueue_scripts', array($this, 'admin_scripts'));
+        
+        
+        // ADD THESE MISSING AJAX HANDLERS:
+        add_action('wp_ajax_wap_save_settings', array($this, 'ajax_save_settings'));
+        add_action('wp_ajax_nopriv_wap_save_settings', array($this, 'ajax_save_settings')); // Remove if admin-only
+        
+        
     }
 
     /**
@@ -1087,6 +1094,7 @@ class WAP_Settings {
             <div class="wap-admin-content">
                 <div class="wap-admin-main">
                     <form method="post" action="options.php" id="wap-settings-form">
+                        <?php wp_nonce_field('wap_admin_nonce', 'wap_nonce'); ?>
                         <?php
                         settings_fields('wap_settings');
                         do_settings_sections('wap_settings');
@@ -1555,6 +1563,100 @@ class WAP_Settings {
 
         return $validated;
     }    
+    
+    
+/**
+ * AJAX handler for saving settings
+ */
+public function ajax_save_settings() {
+    // Verify nonce
+    if (!check_ajax_referer('wap_admin_nonce', 'nonce', false)) {
+        wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
+        return;
+    }
+
+    // Check user permissions
+    if (!current_user_can('manage_woocommerce')) {
+        wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
+        return;
+    }
+
+    try {
+        // Get all settings from the form
+        $settings = $this->get_settings();
+        $updated_count = 0;
+
+        foreach ($settings as $setting) {
+            if (isset($setting['id']) && $setting['type'] !== 'title' && $setting['type'] !== 'sectionend') {
+                $option_name = $setting['id'];
+                
+                if (isset($_POST[$option_name])) {
+                    $value = $this->sanitize_setting_value($_POST[$option_name], $setting);
+                    update_option($option_name, $value);
+                    $updated_count++;
+                } else if ($setting['type'] === 'checkbox') {
+                    // Handle unchecked checkboxes
+                    update_option($option_name, 'no');
+                    $updated_count++;
+                }
+            }
+        }
+
+        // Handle multiselect fields separately
+        $multiselect_fields = array('wap_acf_field_groups', 'wap_meta_box_groups');
+        foreach ($multiselect_fields as $field) {
+            if (isset($_POST[$field])) {
+                $value = is_array($_POST[$field]) ? array_map('sanitize_text_field', $_POST[$field]) : array();
+                update_option($field, $value);
+            } else {
+                update_option($field, array());
+            }
+        }
+
+        // Custom fields configuration
+        $this->save_custom_fields_config();
+
+        wp_send_json_success(array(
+            'message' => sprintf(__('Settings saved successfully! Updated %d options.', 'wooaccordion-pro'), $updated_count)
+        ));
+
+    } catch (Exception $e) {
+        wp_send_json_error(array(
+            'message' => __('Error saving settings: ', 'wooaccordion-pro') . $e->getMessage()
+        ));
+    }
+}
+
+/**
+ * Sanitize setting value based on type
+ */
+private function sanitize_setting_value($value, $setting) {
+    switch ($setting['type']) {
+        case 'textarea':
+            return sanitize_textarea_field($value);
+        case 'email':
+            return sanitize_email($value);
+        case 'url':
+            return esc_url_raw($value);
+        case 'number':
+            return absint($value);
+        case 'color':
+            return sanitize_hex_color($value);
+        case 'checkbox':
+            return $value === 'yes' ? 'yes' : 'no';
+        default:
+            return sanitize_text_field($value);
+    }
+}    
+    
+/**
+ * Log save attempts for debugging
+ */
+private function log_save_attempt($data) {
+    if (defined('WP_DEBUG') && WP_DEBUG) {
+        error_log('WAP Settings Save Attempt: ' . print_r($data, true));
+    }
+}    
     
     
 }
