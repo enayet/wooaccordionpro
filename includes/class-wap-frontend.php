@@ -61,9 +61,9 @@ class WAP_Frontend {
         // Add custom accordion styles
         add_action('wp_head', array($this, 'add_custom_accordion_styles'));
         
-    add_action('wp_ajax_wap_track_interaction', array('WAP_Frontend', 'handle_accordion_analytics'));
-    add_action('wp_ajax_nopriv_wap_track_interaction', array('WAP_Frontend', 'handle_accordion_analytics'));        
-        
+        // Add analytics AJAX handlers
+        add_action('wp_ajax_wap_track_interaction', array($this, 'handle_accordion_analytics'));
+        add_action('wp_ajax_nopriv_wap_track_interaction', array($this, 'handle_accordion_analytics'));
     }
 
     /**
@@ -141,6 +141,11 @@ class WAP_Frontend {
             return;
         }
 
+        // Debug: Log that we're enqueueing scripts
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WAP Frontend: Enqueuing scripts for product page');
+        }
+
         // Enqueue CSS
         wp_enqueue_style(
             'wap-frontend-css',
@@ -163,36 +168,24 @@ class WAP_Frontend {
         wp_enqueue_script(
             'wap-frontend-js',
             WAP_PLUGIN_URL . 'assets/js/frontend.js',
-            array(),
+            array('jquery'),
             WAP_VERSION,
             true
         );
 
-        // Localize script with settings
-        wp_localize_script('wap-frontend-js', 'wap_frontend', array(
-            'ajax_url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('wap_frontend_nonce'),
-            'settings' => array(
-                'animation_type' => get_option('wap_animation_type', 'slide'),
-                'animation_duration' => get_option('wap_animation_duration', '300'),
-                'auto_expand_first' => get_option('wap_auto_expand_first', 'yes'),
-                'allow_multiple_open' => get_option('wap_allow_multiple_open', 'no'),
-                'enable_touch_gestures' => get_option('wap_enable_touch_gestures', 'yes'),
-                'enable_analytics' => get_option('wap_enable_analytics', 'yes'),
-                'product_id' => get_the_ID()
-            )
-        ));
-        
-        
         // Pass ALL settings to frontend
         wp_localize_script('wap-frontend-js', 'wap_frontend', array(
             'ajax_url' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wap_frontend_nonce'),
-            'settings' => $this->get_all_frontend_settings()
-        ));        
-        
+            'settings' => $this->get_all_frontend_settings(),
+            'debug' => defined('WP_DEBUG') && WP_DEBUG ? true : false
+        ));
+
+        // Debug: Log the settings being passed
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WAP Frontend: Settings passed to JS: ' . print_r($this->get_all_frontend_settings(), true));
+        }
     }
-    
     
     /**
      * Get all frontend settings
@@ -252,7 +245,6 @@ class WAP_Frontend {
             'product_id' => get_the_ID()
         );
     }
-    
 
     /**
      * Output accordion HTML
@@ -262,6 +254,11 @@ class WAP_Frontend {
 
         if (empty($wap_accordion_tabs) || !$this->should_show_accordions()) {
             return;
+        }
+
+        // Debug: Log that we're outputting accordion HTML
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WAP Frontend: Outputting accordion HTML with ' . count($wap_accordion_tabs) . ' tabs');
         }
 
         $settings = $this->get_all_frontend_settings();
@@ -324,6 +321,11 @@ class WAP_Frontend {
 
         echo '</div>';
         echo '</div>';
+
+        // Add debug information
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            echo '<!-- WooAccordion Pro Debug: ' . count($wap_accordion_tabs) . ' accordion items rendered -->';
+        }
     }
 
     /**
@@ -363,20 +365,6 @@ class WAP_Frontend {
         );
 
         return isset($icons[$section]) ? $icons[$section] : '<i class="fas fa-file-alt"></i>';
-    }
-
-    /**
-     * Get expand icon
-     */
-    private function get_expand_icon() {
-        return '<i class="fas fa-plus"></i>';
-    }
-
-    /**
-     * Get collapse icon
-     */
-    private function get_collapse_icon() {
-        return '<i class="fas fa-minus"></i>';
     }
 
     /**
@@ -468,14 +456,31 @@ class WAP_Frontend {
      * AJAX handler for accordion analytics
      */
     public function handle_accordion_analytics() {
+        // Debug: Log the request
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WAP Frontend: Analytics handler called with data: ' . print_r($_POST, true));
+        }
+
         check_ajax_referer('wap_frontend_nonce', 'nonce');
 
         $product_id = intval($_POST['product_id']);
         $section = sanitize_text_field($_POST['section']);
-        $action = sanitize_text_field($_POST['action']);
+        $action = sanitize_text_field($_POST['action_type']); // Changed from 'action'
 
         if ($product_id && $section && $action) {
-            WAP_Analytics::instance()->track_interaction($product_id, $section, $action);
+            $analytics = WAP_Analytics::instance();
+            $success = $analytics->track_interaction($product_id, $section, $action);
+            
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("WAP Frontend: Analytics tracking result: " . ($success ? 'success' : 'failed'));
+            }
+            
+            wp_send_json_success(array('tracked' => $success));
+        } else {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("WAP Frontend: Analytics tracking failed - missing data");
+            }
+            wp_send_json_error(array('message' => 'Missing required data'));
         }
 
         wp_die();

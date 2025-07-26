@@ -17,7 +17,6 @@
             this.touchStartY = 0;
             this.touchEndY = 0;
             this.isAnimating = false;
-            //this.timeTracking = {};
 
             this.init();
         }        
@@ -29,8 +28,11 @@
             this.accordionContainer = document.querySelector('.wap-accordion');
 
             if (!this.accordionContainer) {
+                console.log('WooAccordion Pro: No accordion container found');
                 return;
             }
+
+            console.log('WooAccordion Pro: Initializing with settings:', this.settings);
 
             // Apply settings to accordion
             this.applyAccordionSettings();
@@ -60,19 +62,18 @@
             this.triggerEvent('wap:ready');
         }
         
-        
         /**
          * Apply accordion settings
          */
         applyAccordionSettings() {
             // Set data attributes
-            this.accordionContainer.setAttribute('data-animation', this.settings.animation_type);
-            this.accordionContainer.setAttribute('data-easing', this.settings.animation_easing);
-            this.accordionContainer.setAttribute('data-stagger', this.settings.enable_stagger);
+            this.accordionContainer.setAttribute('data-animation', this.settings.animation_type || 'slide');
+            this.accordionContainer.setAttribute('data-easing', this.settings.animation_easing || 'ease');
+            this.accordionContainer.setAttribute('data-stagger', this.settings.enable_stagger || 'no');
 
             // Apply CSS custom properties
-            this.accordionContainer.style.setProperty('--wap-animation-duration', this.settings.animation_duration + 'ms');
-            this.accordionContainer.style.setProperty('--wap-stagger-delay', this.settings.stagger_delay + 'ms');
+            this.accordionContainer.style.setProperty('--wap-animation-duration', (this.settings.animation_duration || 300) + 'ms');
+            this.accordionContainer.style.setProperty('--wap-stagger-delay', (this.settings.stagger_delay || 50) + 'ms');
         }
 
         /**
@@ -81,97 +82,18 @@
         applyStaggerAnimation() {
             const items = this.accordionContainer.querySelectorAll('.wap-accordion-item');
             items.forEach((item, index) => {
-                item.style.animationDelay = (index * parseInt(this.settings.stagger_delay)) + 'ms';
+                item.style.animationDelay = (index * parseInt(this.settings.stagger_delay || 50)) + 'ms';
                 item.classList.add('wap-stagger-item');
             });
         }        
         
-        
-        /**
-         * Animate accordion open with proper easing
-         */
-        animateOpen(content, callback) {
-            const animationType = this.settings.animation_type || 'slide';
-            const duration = parseInt(this.settings.animation_duration) || 300;
-            const easing = this.settings.animation_easing || 'ease';
-
-            // Set CSS transition with proper easing
-            content.style.transition = `max-height ${duration}ms ${this.getCSSEasing(easing)}, opacity ${duration}ms ${this.getCSSEasing(easing)}`;
-
-            switch (animationType) {
-                case 'fade':
-                case 'fade-scale':
-                    this.animateFadeIn(content, duration, callback);
-                    break;
-                case 'bounce':
-                case 'elastic':
-                    this.animateBounceIn(content, duration, callback);
-                    break;
-                case 'slide-spring':
-                    content.style.transition = `max-height 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
-                    this.animateSlideDown(content, duration, callback);
-                    break;
-                case 'slide':
-                default:
-                    this.animateSlideDown(content, duration, callback);
-                    break;
-            }
-        }
-
-        /**
-         * Convert easing setting to CSS easing function
-         */
-        getCSSEasing(easing) {
-            const easingMap = {
-                'ease-in-out-back': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-                'ease-in-out-circ': 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
-                'ease-in-out-expo': 'cubic-bezier(1, 0, 0, 1)',
-                'ease-in-out-sine': 'cubic-bezier(0.445, 0.05, 0.55, 0.95)',
-                'ease': 'ease'
-            };
-
-            return easingMap[easing] || 'ease';
-        }
-
-        /**
-         * Update toggle icon based on settings
-         */
-        updateToggleIcon(header, isOpen) {
-            const toggle = header.querySelector('.wap-accordion-toggle i');
-            if (!toggle) return;
-
-            const iconStyle = this.settings.toggle_icon_style || 'plus-minus';
-
-            switch (iconStyle) {
-                case 'chevron':
-                    toggle.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
-                    break;
-                case 'arrow':
-                    toggle.className = isOpen ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
-                    break;
-                case 'caret':
-                    toggle.className = isOpen ? 'fas fa-caret-up' : 'fas fa-caret-down';
-                    break;
-                case 'custom':
-                    toggle.className = isOpen ? 
-                        this.settings.custom_toggle_expanded : 
-                        this.settings.custom_toggle_collapsed;
-                    break;
-                default: // plus-minus
-                    toggle.className = isOpen ? 'fas fa-minus' : 'fas fa-plus';
-                    break;
-            }
-        }        
-        
-        
-        
-        
-
         /**
          * Setup click event listeners
          */
         setupEventListeners() {
             const headers = this.accordionContainer.querySelectorAll('.wap-accordion-header');
+            
+            console.log('WooAccordion Pro: Found', headers.length, 'accordion headers');
             
             headers.forEach(header => {
                 header.addEventListener('click', (e) => this.handleHeaderClick(e));
@@ -192,11 +114,27 @@
                 return;
             }
 
+            console.log('WooAccordion Pro: Header clicked', event.target);
+
             const header = event.currentTarget;
             const accordionItem = header.closest('.wap-accordion-item');
+            
+            if (!accordionItem) {
+                console.error('WooAccordion Pro: Could not find accordion item');
+                return;
+            }
+
             const content = accordionItem.querySelector('.wap-accordion-content');
+            
+            if (!content) {
+                console.error('WooAccordion Pro: Could not find accordion content');
+                return;
+            }
+
             const isActive = header.classList.contains('wap-active');
-            const section = accordionItem.dataset.section;
+            const section = accordionItem.getAttribute('data-section') || 'unknown';
+
+            console.log('WooAccordion Pro: Section:', section, 'Active:', isActive);
 
             // Close other accordions if multiple open is not allowed
             if (this.settings.allow_multiple_open !== 'yes' && !isActive) {
@@ -250,6 +188,8 @@
         openAccordion(header, content) {
             this.isAnimating = true;
             
+            console.log('WooAccordion Pro: Opening accordion');
+            
             // Add active classes
             header.classList.add('wap-active');
             content.classList.add('wap-active');
@@ -269,6 +209,8 @@
          */
         closeAccordion(header, content) {
             this.isAnimating = true;
+            
+            console.log('WooAccordion Pro: Closing accordion');
             
             // Remove active classes
             header.classList.remove('wap-active');
@@ -298,28 +240,58 @@
         }
 
         /**
-         * Update toggle icon
+         * Update toggle icon based on settings
          */
         updateToggleIcon(header, isOpen) {
             const toggle = header.querySelector('.wap-accordion-toggle i');
-            if (toggle) {
-                toggle.className = isOpen ? 'fas fa-minus' : 'fas fa-plus';
+            if (!toggle) return;
+
+            const iconStyle = this.settings.toggle_icon_style || 'plus-minus';
+
+            switch (iconStyle) {
+                case 'chevron':
+                    toggle.className = isOpen ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
+                    break;
+                case 'arrow':
+                    toggle.className = isOpen ? 'fas fa-arrow-up' : 'fas fa-arrow-down';
+                    break;
+                case 'caret':
+                    toggle.className = isOpen ? 'fas fa-caret-up' : 'fas fa-caret-down';
+                    break;
+                case 'custom':
+                    toggle.className = isOpen ? 
+                        this.settings.custom_toggle_expanded : 
+                        this.settings.custom_toggle_collapsed;
+                    break;
+                default: // plus-minus
+                    toggle.className = isOpen ? 'fas fa-minus' : 'fas fa-plus';
+                    break;
             }
         }
 
         /**
-         * Animate accordion open
+         * Animate accordion open with proper easing
          */
         animateOpen(content, callback) {
             const animationType = this.settings.animation_type || 'slide';
             const duration = parseInt(this.settings.animation_duration) || 300;
-            
+            const easing = this.settings.animation_easing || 'ease';
+
+            // Set CSS transition with proper easing
+            content.style.transition = `max-height ${duration}ms ${this.getCSSEasing(easing)}, opacity ${duration}ms ${this.getCSSEasing(easing)}`;
+
             switch (animationType) {
                 case 'fade':
+                case 'fade-scale':
                     this.animateFadeIn(content, duration, callback);
                     break;
                 case 'bounce':
+                case 'elastic':
                     this.animateBounceIn(content, duration, callback);
+                    break;
+                case 'slide-spring':
+                    content.style.transition = `max-height 400ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
+                    this.animateSlideDown(content, duration, callback);
                     break;
                 case 'slide':
                 default:
@@ -348,12 +320,32 @@
         }
 
         /**
+         * Convert easing setting to CSS easing function
+         */
+        getCSSEasing(easing) {
+            const easingMap = {
+                'ease-in-out-back': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                'ease-in-out-circ': 'cubic-bezier(0.785, 0.135, 0.15, 0.86)',
+                'ease-in-out-expo': 'cubic-bezier(1, 0, 0, 1)',
+                'ease-in-out-sine': 'cubic-bezier(0.445, 0.05, 0.55, 0.95)',
+                'ease': 'ease'
+            };
+
+            return easingMap[easing] || 'ease';
+        }
+
+        /**
          * Slide down animation
          */
         animateSlideDown(content, duration, callback) {
             const inner = content.querySelector('.wap-accordion-content-inner');
-            const height = inner.scrollHeight;
+            if (!inner) {
+                console.error('WooAccordion Pro: No content inner found');
+                if (callback) callback();
+                return;
+            }
             
+            const height = inner.scrollHeight;
             content.style.maxHeight = height + 'px';
             
             setTimeout(() => {
@@ -377,8 +369,12 @@
          */
         animateFadeIn(content, duration, callback) {
             const inner = content.querySelector('.wap-accordion-content-inner');
-            const height = inner.scrollHeight;
+            if (!inner) {
+                if (callback) callback();
+                return;
+            }
             
+            const height = inner.scrollHeight;
             content.style.maxHeight = height + 'px';
             content.style.opacity = '1';
             
@@ -404,8 +400,12 @@
          */
         animateBounceIn(content, duration, callback) {
             const inner = content.querySelector('.wap-accordion-content-inner');
-            const height = inner.scrollHeight;
+            if (!inner) {
+                if (callback) callback();
+                return;
+            }
             
+            const height = inner.scrollHeight;
             content.style.maxHeight = height + 'px';
             
             setTimeout(() => {
@@ -466,8 +466,11 @@
          */
         setupAnalytics() {
             if (this.settings.enable_analytics !== 'yes') {
+                console.log('WooAccordion Pro: Analytics disabled');
                 return;
             }
+
+            console.log('WooAccordion Pro: Analytics enabled, setting up tracking');
 
             // Track initial page view
             this.trackInteraction('page_view', 'view');
@@ -499,19 +502,24 @@
          */
         trackInteraction(section, action) {
             if (this.settings.enable_analytics !== 'yes' || !wap_frontend.ajax_url) {
+                console.log('WooAccordion Pro: Analytics disabled or no AJAX URL');
                 return;
             }
+
+            console.log('WooAccordion Pro: Tracking interaction:', section, action);
 
             const data = {
                 action: 'wap_track_interaction',
                 nonce: wap_frontend.nonce,
                 product_id: this.settings.product_id,
                 section: section,
-                action: action,
+                action_type: action, // Changed from 'action' to avoid conflict
                 timestamp: Date.now(),
                 user_agent: navigator.userAgent,
                 device_type: this.getDeviceType()
             };
+
+            console.log('WooAccordion Pro: Sending tracking data:', data);
 
             // Send analytics data
             fetch(wap_frontend.ajax_url, {
@@ -520,7 +528,15 @@
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: new URLSearchParams(data)
-            }).catch(error => {
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('WooAccordion Pro: Tracking response:', data);
+                if (!data.success) {
+                    console.warn('WooAccordion Pro: Tracking failed:', data.data);
+                }
+            })
+            .catch(error => {
                 console.warn('WooAccordion Pro: Analytics tracking failed', error);
             });
         }
@@ -576,6 +592,7 @@
             const firstHeader = this.accordionContainer.querySelector('.wap-accordion-header');
             if (firstHeader && !firstHeader.classList.contains('wap-active')) {
                 setTimeout(() => {
+                    console.log('WooAccordion Pro: Auto-expanding first accordion');
                     firstHeader.click();
                 }, 100);
             }
@@ -618,7 +635,9 @@
             
             activeContents.forEach(content => {
                 const inner = content.querySelector('.wap-accordion-content-inner');
-                content.style.maxHeight = inner.scrollHeight + 'px';
+                if (inner) {
+                    content.style.maxHeight = inner.scrollHeight + 'px';
+                }
             });
         }
 
@@ -660,6 +679,14 @@
      * Initialize when DOM is ready
      */
     document.addEventListener('DOMContentLoaded', function() {
+        console.log('WooAccordion Pro: DOM ready, initializing...');
+        
+        // Check if wap_frontend is available
+        if (typeof wap_frontend === 'undefined') {
+            console.error('WooAccordion Pro: wap_frontend object not found. Plugin may not be properly loaded.');
+            return;
+        }
+        
         // Initialize WooAccordion Pro
         window.WooAccordionPro = new WooAccordionPro();
         
@@ -669,9 +696,11 @@
             closeAll: () => window.WooAccordionPro.closeAll(),
             toggle: (section) => window.WooAccordionPro.toggle(section)
         };
+
+        console.log('WooAccordion Pro: Initialization complete');
     });
 
-})(jQuery || window.jQuery || function(sel, ctx) {
+})(window.jQuery || function(sel, ctx) {
     // Minimal jQuery fallback for basic selector functionality
     return (ctx || document).querySelectorAll(sel);
 });

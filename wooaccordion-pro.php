@@ -74,6 +74,9 @@ final class WooAccordionPro {
         // Activation and deactivation hooks
         register_activation_hook(__FILE__, array($this, 'activate'));
         register_deactivation_hook(__FILE__, array($this, 'deactivate'));
+        
+        // Debug hook
+        add_action('wp_footer', array($this, 'debug_output'));
     }
 
     /**
@@ -91,6 +94,11 @@ final class WooAccordionPro {
 
         // Init action
         do_action('wooaccordion_pro_init');
+        
+        // Debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WooAccordion Pro: Plugin initialized');
+        }
     }
 
     /**
@@ -104,6 +112,11 @@ final class WooAccordionPro {
         }
 
         do_action('wooaccordion_pro_loaded');
+        
+        // Debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WooAccordion Pro: All plugins loaded, WooCommerce detected');
+        }
     }
 
     /**
@@ -133,11 +146,17 @@ final class WooAccordionPro {
             WAP_Settings::instance();
         }
 
-        if (!is_admin() || wp_doing_ajax()) {
-            WAP_Frontend::instance();
-        }
-        WAP_Custom_Fields::instance();
+        // Always initialize these
+        WAP_Frontend::instance();
         WAP_Analytics::instance();
+        WAP_Custom_Fields::instance();
+        
+        // Debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WooAccordion Pro: All classes included and initialized');
+            error_log('WooAccordion Pro: Settings enabled - ' . get_option('wap_enable_accordion', 'not set'));
+            error_log('WooAccordion Pro: Analytics enabled - ' . get_option('wap_enable_analytics', 'not set'));
+        }
     }
 
     /**
@@ -191,6 +210,14 @@ final class WooAccordionPro {
         // Set activation flag
         add_option('wap_activation_time', current_time('mysql'));
         add_option('wap_version', WAP_VERSION);
+        
+        // Flush rewrite rules
+        flush_rewrite_rules();
+        
+        // Debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WooAccordion Pro: Plugin activated with default settings');
+        }
     }
 
     /**
@@ -199,6 +226,14 @@ final class WooAccordionPro {
     public function deactivate() {
         // Clean up scheduled events if any
         wp_clear_scheduled_hook('wap_cleanup_analytics');
+        
+        // Flush rewrite rules
+        flush_rewrite_rules();
+        
+        // Debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WooAccordion Pro: Plugin deactivated');
+        }
     }
 
     /**
@@ -226,7 +261,36 @@ final class WooAccordionPro {
         ) $charset_collate;";
 
         require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+        $result = dbDelta($sql);
+        
+        // Debug
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('WooAccordion Pro: Analytics table creation result: ' . print_r($result, true));
+            
+            // Check if table was created
+            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
+            error_log('WooAccordion Pro: Analytics table exists: ' . ($table_exists ? 'YES' : 'NO'));
+        }
+    }
+
+    /**
+     * Debug output on frontend
+     */
+    public function debug_output() {
+        if (!defined('WP_DEBUG') || !WP_DEBUG || !is_product()) {
+            return;
+        }
+        
+        echo '<!-- WooAccordion Pro Debug Info
+Settings:
+- Accordion Enabled: ' . get_option('wap_enable_accordion', 'not set') . '
+- Analytics Enabled: ' . get_option('wap_enable_analytics', 'not set') . '
+- Animation Type: ' . get_option('wap_animation_type', 'not set') . '
+Classes Loaded:
+- Frontend: ' . (class_exists('WAP_Frontend') ? 'YES' : 'NO') . '
+- Analytics: ' . (class_exists('WAP_Analytics') ? 'YES' : 'NO') . '
+- Settings: ' . (class_exists('WAP_Settings') ? 'YES' : 'NO') . '
+-->';
     }
 
     /**
