@@ -1,6 +1,5 @@
 /**
- * WooAccordion Pro - Admin Styles
- * Version: 1.0.0
+ * WooAccordion Pro - Premium Admin Styles
  */
 
 /* Admin Wrap */
@@ -9,7 +8,7 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Admin Header */
+/* Premium Header */
 .wap-admin-header {
     background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: white;
@@ -79,7 +78,7 @@
     gap: 1.5rem;
 }
 
-/* Settings Tabs */
+/* Premium Tabs */
 .wap-settings-tabs {
     border: none;
 }
@@ -89,7 +88,6 @@
     background: #f8f9fa;
     border-bottom: 1px solid #dee2e6;
     overflow-x: auto;
-    flex-wrap: nowrap;
 }
 
 .wap-tab-button {
@@ -183,15 +181,6 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.wap-form-field input[type="text"]:focus,
-.wap-form-field input[type="number"]:focus,
-.wap-form-field select:focus,
-.wap-form-field textarea:focus {
-    outline: none;
-    border-color: #6366f1;
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-}
-
 .wap-form-field input[type="color"] {
     width: 60px;
     height: 40px;
@@ -208,10 +197,11 @@
     accent-color: #6366f1;
 }
 
-.wap-form-field textarea {
-    min-height: 120px;
-    resize: vertical;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+.wap-form-field input:focus,
+.wap-form-field select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .wap-form-field .description {
@@ -259,21 +249,6 @@
 .wap-form-actions .button-secondary:hover {
     background: #f9fafb;
     border-color: #9ca3af;
-}
-
-.wap-form-actions .button-link-delete {
-    color: #dc2626;
-    text-decoration: none;
-    padding: 0.75rem 1rem;
-    border: none;
-    background: none;
-    cursor: pointer;
-    font-size: 0.9rem;
-}
-
-.wap-form-actions .button-link-delete:hover {
-    color: #b91c1c;
-    text-decoration: underline;
 }
 
 /* Sidebar Boxes */
@@ -379,69 +354,50 @@
     transform: translateY(-1px);
 }
 
-/* Modal Styles */
-.wap-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 100000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+/* Notices */
+.wap-notice {
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
+    margin: 1rem 0;
 }
 
-.wap-modal-content {
-    background: white;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow: hidden;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+.wap-notice-info {
+    background: #dbeafe;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
 }
 
-.wap-modal-header {
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.wap-notice-success {
+    background: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
 }
 
-.wap-modal-header h3 {
+.wap-notice-warning {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+}
+
+.wap-notice-error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.wap-notice h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.wap-notice ul {
     margin: 0;
-    font-size: 1.4rem;
-    color: #1f2937;
+    padding-left: 1.5rem;
 }
 
-.wap-modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: #9ca3af;
-    cursor: pointer;
-    padding: 0;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.wap-modal-close:hover {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-.wap-modal-body {
-    padding: 2rem;
-    overflow-y: auto;
-    max-height: 60vh;
+.wap-notice li {
+    margin-bottom: 0.25rem;
 }
 
 /* Loading States */
@@ -468,89 +424,6 @@
     to {
         transform: rotate(360deg);
     }
-}
-
-/* Success/Error Messages */
-.wap-notice {
-    padding: 1rem 1.5rem;
-    border-radius: 6px;
-    margin: 1rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.wap-notice-success {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #bbf7d0;
-}
-
-.wap-notice-error {
-    background: #fee2e2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-}
-
-.wap-notice-warning {
-    background: #fef3c7;
-    color: #d97706;
-    border: 1px solid #fde68a;
-}
-
-.wap-notice-info {
-    background: #dbeafe;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
-}
-
-/* Analytics Styles */
-.wap-analytics-overview {
-    padding: 2rem;
-}
-
-.wap-analytics-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.wap-analytics-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-    text-align: center;
-}
-
-.wap-analytics-card h3 {
-    margin: 0 0 1rem 0;
-    font-size: 0.9rem;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.wap-analytics-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: #6366f1;
-}
-
-.wap-table-container {
-    background: white;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
-}
-
-.wap-no-data {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: #6b7280;
 }
 
 /* Responsive Design */
@@ -617,14 +490,5 @@
     
     .wap-tab-content {
         padding: 1rem;
-    }
-    
-    .wap-modal-content {
-        width: 95%;
-    }
-    
-    .wap-modal-header,
-    .wap-modal-body {
-        padding: 1rem 1.5rem;
     }
 }
