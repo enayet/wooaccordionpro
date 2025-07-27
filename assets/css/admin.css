@@ -843,3 +843,152 @@
 
 
 
+/* Enhanced Loading States */
+.wap-modal-body.wap-loading {
+    position: relative;
+}
+
+.wap-modal-body.wap-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    border-radius: 6px;
+}
+
+.wap-modal-body.wap-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    margin: -16px 0 0 -16px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #6366f1;
+    border-radius: 50%;
+    animation: wap-spin 1s linear infinite;
+    z-index: 11;
+}
+
+/* Info message styling */
+.wap-modal-message.info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+/* Form loading state */
+.wap-form-loading {
+    opacity: 0.6;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Smooth transitions for form fields */
+.wap-form-field input,
+.wap-form-field select,
+.wap-form-field textarea {
+    transition: opacity 0.3s ease;
+}
+
+/* Loading overlay for entire modal content */
+.wap-modal-content.wap-loading {
+    position: relative;
+}
+
+.wap-modal-content.wap-loading .wap-modal-body {
+    opacity: 0.6;
+}
+
+/* Pulse animation for loading states */
+@keyframes wap-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.wap-loading-pulse {
+    animation: wap-pulse 1.5s ease-in-out infinite;
+}
+
+
+
+/* Simple Editor Styles - Add this to your admin.css file */
+
+.wap-simple-editor-wrapper {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    margin-top: 8px;
+}
+
+.wap-simple-toolbar {
+    background: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.wap-format-btn, .wap-link-btn {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+    color: #333;
+}
+
+.wap-format-btn:hover, .wap-link-btn:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.wap-format-btn:active, .wap-link-btn:active {
+    background: #dee2e6;
+}
+
+.wap-simple-editor-wrapper textarea {
+    border: none;
+    width: 100%;
+    padding: 12px;
+    font-family: Consolas, Monaco, 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    background: #fff;
+}
+
+.wap-simple-editor-wrapper textarea:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.wap-simple-editor-wrapper textarea::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wap-simple-toolbar {
+        padding: 6px;
+        gap: 2px;
+    }
+    
+    .wap-format-btn, .wap-link-btn {
+        padding: 3px 6px;
+        font-size: 11px;
+    }
+}

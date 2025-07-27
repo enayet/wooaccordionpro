@@ -1,6 +1,6 @@
 <?php
 /**
- * WooAccordion Pro Custom Tabs Manager
+ * WooAccordion Pro Custom Tabs Manager - FIXED VERSION
  * 
  * Handles custom tab creation and conditional logic
  */
@@ -73,27 +73,45 @@ class WAP_Custom_Tabs {
     }
 
     /**
-     * Sanitize tab data
+     * Sanitize tab data - IMPROVED VERSION
      */
     private function sanitize_tab_data($data) {
+        // Ensure conditions is properly structured
+        $conditions = array(
+            'categories' => array(),
+            'user_roles' => array(),
+            'product_types' => array()
+        );
+        
+        if (isset($data['conditions']) && is_array($data['conditions'])) {
+            if (isset($data['conditions']['categories']) && is_array($data['conditions']['categories'])) {
+                $conditions['categories'] = array_map('intval', array_filter($data['conditions']['categories']));
+            }
+            if (isset($data['conditions']['user_roles']) && is_array($data['conditions']['user_roles'])) {
+                $conditions['user_roles'] = array_map('sanitize_text_field', array_filter($data['conditions']['user_roles']));
+            }
+            if (isset($data['conditions']['product_types']) && is_array($data['conditions']['product_types'])) {
+                $conditions['product_types'] = array_map('sanitize_text_field', array_filter($data['conditions']['product_types']));
+            }
+        }
+        
         return array(
             'title' => sanitize_text_field($data['title'] ?? ''),
             'content' => wp_kses_post($data['content'] ?? ''),
             'priority' => intval($data['priority'] ?? 50),
             'enabled' => !empty($data['enabled']),
-            'conditions' => array(
-                'categories' => array_map('intval', $data['conditions']['categories'] ?? array()),
-                'user_roles' => array_map('sanitize_text_field', $data['conditions']['user_roles'] ?? array()),
-                'product_types' => array_map('sanitize_text_field', $data['conditions']['product_types'] ?? array())
-            )
+            'conditions' => $conditions
         );
     }
 
     /**
-     * AJAX: Save custom tab
+     * AJAX: Save custom tab - FIXED VERSION
      */
     public function ajax_save_custom_tab() {
-        check_ajax_referer('wap_admin_nonce', 'nonce');
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wap_admin_nonce')) {
+            wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
+        }
 
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
@@ -102,10 +120,19 @@ class WAP_Custom_Tabs {
         $tab_id = sanitize_text_field($_POST['tab_id'] ?? '');
         $tab_data = $_POST['tab_data'] ?? array();
 
+        // Debug: Log received data
+        error_log('WAP Custom Tab Save - Received data: ' . print_r($_POST, true));
+
+        // Validate required fields
+        if (empty($tab_data['title'])) {
+            wp_send_json_error(array('message' => __('Tab title is required', 'wooaccordion-pro')));
+        }
+
         if ($this->save_custom_tab($tab_id, $tab_data)) {
+            $response_tab_id = $tab_id ?: 'tab_' . time();
             wp_send_json_success(array(
                 'message' => __('Custom tab saved successfully!', 'wooaccordion-pro'),
-                'tab_id' => $tab_id ?: 'tab_' . time()
+                'tab_id' => $response_tab_id
             ));
         } else {
             wp_send_json_error(array('message' => __('Failed to save custom tab', 'wooaccordion-pro')));
@@ -116,7 +143,10 @@ class WAP_Custom_Tabs {
      * AJAX: Delete custom tab
      */
     public function ajax_delete_custom_tab() {
-        check_ajax_referer('wap_admin_nonce', 'nonce');
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wap_admin_nonce')) {
+            wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
+        }
 
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
@@ -132,10 +162,13 @@ class WAP_Custom_Tabs {
     }
 
     /**
-     * AJAX: Get custom tab data
+     * AJAX: Get custom tab data - FIXED VERSION
      */
     public function ajax_get_custom_tab() {
-        check_ajax_referer('wap_admin_nonce', 'nonce');
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wap_admin_nonce')) {
+            wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
+        }
 
         if (!current_user_can('manage_woocommerce')) {
             wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
@@ -145,6 +178,9 @@ class WAP_Custom_Tabs {
         $custom_tabs = $this->get_custom_tabs();
 
         if (isset($custom_tabs[$tab_id])) {
+            // Debug: Log the data being sent
+            error_log('WAP Custom Tab Get - Sending data for tab ' . $tab_id . ': ' . print_r($custom_tabs[$tab_id], true));
+            
             wp_send_json_success(array('tab_data' => $custom_tabs[$tab_id]));
         } else {
             wp_send_json_error(array('message' => __('Tab not found', 'wooaccordion-pro')));
@@ -154,44 +190,41 @@ class WAP_Custom_Tabs {
     /**
      * Get available product categories for conditions
      */
-public function get_product_categories() {
-    $categories = get_terms(array(
-        'taxonomy' => 'product_cat',
-        'hide_empty' => false,
-        'orderby' => 'name',
-        'order' => 'ASC'
-    ));
+    public function get_product_categories() {
+        $categories = get_terms(array(
+            'taxonomy' => 'product_cat',
+            'hide_empty' => false,
+            'orderby' => 'name',
+            'order' => 'ASC'
+        ));
 
-    if (is_wp_error($categories)) {
-        return array();
-    }
-
-    return $this->build_category_hierarchy($categories);
-}
-    
-    
-    
-/**
- * Build simple hierarchical category structure
- */
-private function build_category_hierarchy($categories, $parent_id = 0, $level = 0) {
-    $hierarchy = array();
-    
-    foreach ($categories as $category) {
-        if ($category->parent == $parent_id) {
-            // Add simple indentation with dashes
-            $indent = str_repeat('— ', $level);
-            $hierarchy[$category->term_id] = $indent . $category->name;
-            
-            // Get children recursively
-            $children = $this->build_category_hierarchy($categories, $category->term_id, $level + 1);
-            $hierarchy = $hierarchy + $children;
+        if (is_wp_error($categories)) {
+            return array();
         }
+
+        return $this->build_category_hierarchy($categories);
     }
     
-    return $hierarchy;
-}    
-    
+    /**
+     * Build simple hierarchical category structure
+     */
+    private function build_category_hierarchy($categories, $parent_id = 0, $level = 0) {
+        $hierarchy = array();
+        
+        foreach ($categories as $category) {
+            if ($category->parent == $parent_id) {
+                // Add simple indentation with dashes
+                $indent = str_repeat('— ', $level);
+                $hierarchy[$category->term_id] = $indent . $category->name;
+                
+                // Get children recursively
+                $children = $this->build_category_hierarchy($categories, $category->term_id, $level + 1);
+                $hierarchy = $hierarchy + $children;
+            }
+        }
+        
+        return $hierarchy;
+    }
 
     /**
      * Get available user roles for conditions

@@ -44,7 +44,7 @@
 
 .wap-accordion-header.wap-active {
     background: var(--wap-active-bg);
-    color: white;
+/*    color: white;*/
 }
 
 .wap-accordion-icon {
@@ -254,6 +254,7 @@
 
 .wap-template-classic .wap-accordion-header.wap-active {
     background: #333;
+    color: #fff;
 }
 
 /* Mobile Responsive */

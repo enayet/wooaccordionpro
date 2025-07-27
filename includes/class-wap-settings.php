@@ -91,6 +91,9 @@ class WAP_Settings {
                 WAP_VERSION,
                 true
             );
+            
+            // Enqueue WordPress editor assets
+            wp_enqueue_editor(); 
 
             wp_localize_script('wap-admin-js', 'wap_admin', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
@@ -495,16 +498,7 @@ class WAP_Settings {
                         <div class="wap-form-section">
                             <h4><?php _e('Tab Content', 'wooaccordion-pro'); ?></h4>
                             
-                            <div class="wap-form-field">
-                                <label for="wap-tab-content"><?php _e('Content', 'wooaccordion-pro'); ?></label>
-                                <textarea id="wap-tab-content" name="tab_data[content]" rows="8"></textarea>
-                                <p class="description">
-                                    <?php _e('Tab content. You can use HTML and the following placeholders:', 'wooaccordion-pro'); ?>
-                                    <br>
-                                    <code>{product_name}</code>, <code>{product_price}</code>, <code>{product_sku}</code>, 
-                                    <code>{product_weight}</code>, <code>{product_dimensions}</code>
-                                </p>
-                            </div>
+                            <?php $this->render_wp_editor_in_modal(); ?>
                         </div>
 
                         <div class="wap-form-section">
@@ -623,6 +617,7 @@ class WAP_Settings {
      * AJAX handler for saving settings
      */
     public function ajax_save_settings() {
+        // Use check_ajax_referer for proper nonce validation
         check_ajax_referer('wap_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_woocommerce')) {
@@ -635,13 +630,13 @@ class WAP_Settings {
             'wap_allow_multiple_open' => isset($_POST['wap_allow_multiple_open']) ? 'yes' : 'no',
             'wap_show_icons' => isset($_POST['wap_show_icons']) ? 'yes' : 'no',
             'wap_enable_mobile_gestures' => isset($_POST['wap_enable_mobile_gestures']) ? 'yes' : 'no',
-            'wap_template' => sanitize_text_field($_POST['wap_template']),
-            'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library']),
-            'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration']),
-            'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color']),
-            'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color']),
-            'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color']),
-            'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'])
+            'wap_template' => sanitize_text_field($_POST['wap_template'] ?? 'modern'),
+            'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library'] ?? 'css'),
+            'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration'] ?? '300'),
+            'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
+            'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
+            'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
+            'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
         );
 
         foreach ($settings as $key => $value) {
@@ -650,4 +645,54 @@ class WAP_Settings {
 
         wp_send_json_success(array('message' => __('Settings saved successfully!', 'wooaccordion-pro')));
     }
+    
+    
+private function render_wp_editor_in_modal() {
+    ?>
+    <div class="wap-form-field">
+        <label for="wap-tab-content"><?php _e('Content', 'wooaccordion-pro'); ?></label>
+        
+        <div class="wap-simple-editor-wrapper">
+            <!-- Simple formatting toolbar -->
+            <div class="wap-simple-toolbar">
+                <button type="button" class="wap-format-btn" data-tag="strong" title="Bold">
+                    <strong>B</strong>
+                </button>
+                <button type="button" class="wap-format-btn" data-tag="em" title="Italic">
+                    <em>I</em>
+                </button>
+                <button type="button" class="wap-format-btn" data-tag="h2" title="Heading 2">
+                    H2
+                </button>
+                <button type="button" class="wap-format-btn" data-tag="h3" title="Heading 3">
+                    H3
+                </button>
+                <button type="button" class="wap-format-btn" data-tag="ul" title="Bullet List">
+                    • List
+                </button>
+                <button type="button" class="wap-format-btn" data-tag="code" title="Code">
+                    &lt;/&gt;
+                </button>
+                <button type="button" class="wap-link-btn" title="Insert Link">
+                    🔗 Link
+                </button>
+            </div>
+            
+            <textarea id="wap-tab-content" name="tab_data[content]" rows="10" class="large-text" 
+                      placeholder="Enter your tab content here. You can use HTML tags for formatting."></textarea>
+        </div>
+        
+        <p class="description">
+            <?php _e('Tab content supports HTML. Use the buttons above for quick formatting, or type HTML directly.', 'wooaccordion-pro'); ?>
+            <br>
+            <?php _e('Placeholders:', 'wooaccordion-pro'); ?>
+            <code>{product_name}</code>, <code>{product_price}</code>, <code>{product_sku}</code>, 
+            <code>{product_weight}</code>, <code>{product_dimensions}</code>
+        </p>
+    </div>
+    <?php
+}   
+    
+    
+    
 }
