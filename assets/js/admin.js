@@ -68,7 +68,65 @@
             $('input[type="color"]').on('change', () => {
                 this.updatePreview();
             });
+
+            // Individual color reset buttons
+            $(document).on('click', '.wap-reset-color', (e) => {
+                e.preventDefault();
+                const $button = $(e.currentTarget);
+                const fieldId = $button.data('field');
+                const defaultValue = $button.data('default');
+
+                $('#' + fieldId).val(defaultValue);
+                this.updatePreview();
+                this.showNotice('success', 'Color reset to default');
+            });
+
+            // Template change handler - reset colors to template defaults
+            $('#wap_template').on('change', (e) => {
+                const template = $(e.target).val();
+                this.resetColorsToTemplate(template);
+            });
         }
+        
+        
+        /**
+         * Reset colors to template defaults
+         */
+        resetColorsToTemplate(template) {
+            const templateDefaults = {
+                'modern': {
+                    'wap_header_bg_color': '#f8f9fa',
+                    'wap_header_text_color': '#495057',
+                    'wap_active_header_bg_color': '#0073aa',
+                    'wap_border_color': '#dee2e6'
+                },
+                'minimal': {
+                    'wap_header_bg_color': '#ffffff',
+                    'wap_header_text_color': '#333333',
+                    'wap_active_header_bg_color': '#6366f1',
+                    'wap_border_color': '#e5e7eb'
+                },
+                'classic': {
+                    'wap_header_bg_color': '#f1f1f1',
+                    'wap_header_text_color': '#333333',
+                    'wap_active_header_bg_color': '#333333',
+                    'wap_border_color': '#cccccc'
+                }
+            };
+
+            const defaults = templateDefaults[template] || templateDefaults['modern'];
+
+            // Update color fields
+            Object.entries(defaults).forEach(([field, color]) => {
+                $('#' + field).val(color);
+
+                // Update reset button default values
+                $('.wap-reset-color[data-field="' + field + '"]').attr('data-default', color);
+            });
+
+            this.updatePreview();
+            this.showNotice('info', 'Colors updated to match template defaults');
+        }        
 
         /**
          * Save settings via AJAX

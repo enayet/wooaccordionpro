@@ -110,20 +110,33 @@ class WAP_Settings {
      * Save settings (traditional form submission)
      */
     private function save_settings() {
+        $current_template = get_option('wap_template', 'modern');
+        $new_template = sanitize_text_field($_POST['wap_template'] ?? 'modern');
+
         $settings = array(
             'wap_enable_accordion' => isset($_POST['wap_enable_accordion']) ? 'yes' : 'no',
             'wap_auto_expand_first' => isset($_POST['wap_auto_expand_first']) ? 'yes' : 'no',
             'wap_allow_multiple_open' => isset($_POST['wap_allow_multiple_open']) ? 'yes' : 'no',
             'wap_show_icons' => isset($_POST['wap_show_icons']) ? 'yes' : 'no',
             'wap_enable_mobile_gestures' => isset($_POST['wap_enable_mobile_gestures']) ? 'yes' : 'no',
-            'wap_template' => sanitize_text_field($_POST['wap_template'] ?? 'modern'),
+            'wap_template' => $new_template,
             'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library'] ?? 'css'),
             'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration'] ?? '300'),
-            'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
-            'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
-            'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
-            'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
         );
+
+        // If template changed, reset colors to template defaults
+        if ($current_template !== $new_template) {
+            $template_defaults = $this->get_template_defaults($new_template);
+            $settings = array_merge($settings, $template_defaults);
+        } else {
+            // Use submitted colors
+            $settings = array_merge($settings, array(
+                'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
+                'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
+                'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
+                'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
+            ));
+        }
 
         foreach ($settings as $key => $value) {
             update_option($key, $value);
@@ -261,34 +274,54 @@ class WAP_Settings {
                                                 <?php _e('Classic', 'wooaccordion-pro'); ?>
                                             </option>
                                         </select>
-                                        <p class="description"><?php _e('Choose a pre-designed layout template', 'wooaccordion-pro'); ?></p>
+                                        <p class="description"><?php _e('Choose a pre-designed layout template. Colors will reset to template defaults when changed.', 'wooaccordion-pro'); ?></p>
                                     </div>
 
                                     <div class="wap-form-field">
                                         <label for="wap_header_bg_color"><?php _e('Header Background', 'wooaccordion-pro'); ?></label>
-                                        <input type="color" id="wap_header_bg_color" name="wap_header_bg_color" 
-                                               value="<?php echo esc_attr(get_option('wap_header_bg_color', '#f8f9fa')); ?>" />
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="color" id="wap_header_bg_color" name="wap_header_bg_color" 
+                                                   value="<?php echo esc_attr(get_option('wap_header_bg_color', '#f8f9fa')); ?>" />
+                                            <button type="button" class="button button-small wap-reset-color" data-field="wap_header_bg_color" data-default="#f8f9fa">
+                                                <?php _e('Reset', 'wooaccordion-pro'); ?>
+                                            </button>
+                                        </div>
                                         <p class="description"><?php _e('Background color for accordion headers', 'wooaccordion-pro'); ?></p>
                                     </div>
 
                                     <div class="wap-form-field">
                                         <label for="wap_header_text_color"><?php _e('Header Text Color', 'wooaccordion-pro'); ?></label>
-                                        <input type="color" id="wap_header_text_color" name="wap_header_text_color" 
-                                               value="<?php echo esc_attr(get_option('wap_header_text_color', '#495057')); ?>" />
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="color" id="wap_header_text_color" name="wap_header_text_color" 
+                                                   value="<?php echo esc_attr(get_option('wap_header_text_color', '#495057')); ?>" />
+                                            <button type="button" class="button button-small wap-reset-color" data-field="wap_header_text_color" data-default="#495057">
+                                                <?php _e('Reset', 'wooaccordion-pro'); ?>
+                                            </button>
+                                        </div>
                                         <p class="description"><?php _e('Text color for accordion headers', 'wooaccordion-pro'); ?></p>
                                     </div>
 
                                     <div class="wap-form-field">
                                         <label for="wap_active_header_bg_color"><?php _e('Active Header Background', 'wooaccordion-pro'); ?></label>
-                                        <input type="color" id="wap_active_header_bg_color" name="wap_active_header_bg_color" 
-                                               value="<?php echo esc_attr(get_option('wap_active_header_bg_color', '#0073aa')); ?>" />
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="color" id="wap_active_header_bg_color" name="wap_active_header_bg_color" 
+                                                   value="<?php echo esc_attr(get_option('wap_active_header_bg_color', '#0073aa')); ?>" />
+                                            <button type="button" class="button button-small wap-reset-color" data-field="wap_active_header_bg_color" data-default="#0073aa">
+                                                <?php _e('Reset', 'wooaccordion-pro'); ?>
+                                            </button>
+                                        </div>
                                         <p class="description"><?php _e('Background color for active/expanded accordion headers', 'wooaccordion-pro'); ?></p>
                                     </div>
 
                                     <div class="wap-form-field">
                                         <label for="wap_border_color"><?php _e('Border Color', 'wooaccordion-pro'); ?></label>
-                                        <input type="color" id="wap_border_color" name="wap_border_color" 
-                                               value="<?php echo esc_attr(get_option('wap_border_color', '#dee2e6')); ?>" />
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="color" id="wap_border_color" name="wap_border_color" 
+                                                   value="<?php echo esc_attr(get_option('wap_border_color', '#dee2e6')); ?>" />
+                                            <button type="button" class="button button-small wap-reset-color" data-field="wap_border_color" data-default="#dee2e6">
+                                                <?php _e('Reset', 'wooaccordion-pro'); ?>
+                                            </button>
+                                        </div>
                                         <p class="description"><?php _e('Border color for accordion items', 'wooaccordion-pro'); ?></p>
                                     </div>
                                 </div>
@@ -692,6 +725,34 @@ private function render_wp_editor_in_modal() {
     </div>
     <?php
 }   
+    
+/**
+ * Get default colors for templates
+ */
+private function get_template_defaults($template = 'modern') {
+    $defaults = array(
+        'modern' => array(
+            'wap_header_bg_color' => '#f8f9fa',
+            'wap_header_text_color' => '#495057',
+            'wap_active_header_bg_color' => '#0073aa',
+            'wap_border_color' => '#dee2e6'
+        ),
+        'minimal' => array(
+            'wap_header_bg_color' => '#ffffff',
+            'wap_header_text_color' => '#333333',
+            'wap_active_header_bg_color' => '#6366f1',
+            'wap_border_color' => '#e5e7eb'
+        ),
+        'classic' => array(
+            'wap_header_bg_color' => '#f1f1f1',
+            'wap_header_text_color' => '#333333',
+            'wap_active_header_bg_color' => '#333333',
+            'wap_border_color' => '#cccccc'
+        )
+    );
+    
+    return $defaults[$template] ?? $defaults['modern'];
+}    
     
     
     

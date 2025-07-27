@@ -305,3 +305,56 @@
     border: 1px solid var(--wap-border-color);
     text-align: left;
 }
+
+
+
+
+
+
+/* Color Reset Button Styling */
+.wap-reset-color {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.75rem;
+    height: 28px;
+    line-height: 1;
+    background: #f1f1f1;
+    border-color: #ccd0d4;
+    color: #555;
+    transition: all 0.2s ease;
+}
+
+.wap-reset-color:hover {
+    background: #e8e8e8;
+    border-color: #999;
+    color: #333;
+}
+
+.wap-reset-color:focus {
+    box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
+    outline: none;
+}
+
+/* Color field container */
+.wap-form-field input[type="color"] + .button {
+    margin-left: 0.5rem;
+}
+
+/* Enhanced notice styling for color resets */
+.wap-notice.wap-notice-info {
+    background: #e6f3ff;
+    color: #0073aa;
+    border-left: 4px solid #0073aa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .wap-form-field > div {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .wap-reset-color {
+        margin-top: 0.5rem;
+        margin-left: 0;
+    }
+}
