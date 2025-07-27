@@ -44,7 +44,7 @@
 
 .wap-accordion-header.wap-active {
     background: var(--wap-active-bg);
-/*    color: white;*/
+    color: var(--wap-active-text); /* NEW: Use active text color variable */
 }
 
 .wap-accordion-icon {
@@ -248,13 +248,11 @@
 }
 
 .wap-template-classic .wap-accordion-header {
-    background: #f1f1f1;
     border-radius: 0;
 }
 
 .wap-template-classic .wap-accordion-header.wap-active {
-    background: #333;
-    color: #fff;
+
 }
 
 /* Mobile Responsive */
@@ -357,4 +355,272 @@
         margin-top: 0.5rem;
         margin-left: 0;
     }
+}
+
+
+
+
+/* Toggle Icon Styles */
+
+.wap-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.wap-icon:before,
+.wap-icon:after {
+    content: '';
+    position: absolute;
+    background: currentColor;
+    transition: all 0.3s ease;
+}
+
+/* Plus/Minus Icons (Default) - These work fine */
+.wap-plus:before,
+.wap-plus:after {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.wap-plus:before {
+    width: 14px;
+    height: 2px;
+}
+
+.wap-plus:after {
+    width: 2px;
+    height: 14px;
+}
+
+.wap-minus:before {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 14px;
+    height: 2px;
+}
+
+/* Arrow Icons - FIXED */
+.wap-arrow {
+    font-style: normal;
+}
+
+.wap-arrow:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    padding: 3px;
+    background: none;
+}
+
+.wap-arrow-down:before {
+    transform: translate(-50%, -70%) rotate(45deg);
+}
+
+.wap-arrow-up:before {
+    transform: translate(-50%, -30%) rotate(-135deg);
+}
+
+/* Chevron Icons - FIXED */
+.wap-chevron {
+    font-style: normal;
+}
+
+.wap-chevron:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    padding: 4px;
+    background: none;
+}
+
+.wap-chevron-down:before {
+    transform: translate(-50%, -70%) rotate(45deg);
+}
+
+.wap-chevron-up:before {
+    transform: translate(-50%, -30%) rotate(-135deg);
+}
+
+/* Triangle Icons - FIXED with Unicode */
+.wap-triangle {
+    font-style: normal;
+    line-height: 1;
+    text-align: center;
+}
+
+.wap-triangle:before {
+    content: '▶';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    background: none;
+    border: none;
+    width: auto;
+    height: auto;
+}
+
+.wap-triangle-right:before {
+    content: '▶';
+}
+
+.wap-triangle-down:before {
+    content: '▼';
+}
+
+/* Alternative Triangle Icons using CSS borders - if Unicode doesn't work */
+.wap-triangle-alt {
+    font-style: normal;
+}
+
+.wap-triangle-alt:before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: none;
+}
+
+.wap-triangle-alt.wap-triangle-right:before {
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid currentColor;
+    transform: translate(-70%, -50%);
+}
+
+.wap-triangle-alt.wap-triangle-down:before {
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid currentColor;
+    transform: translate(-50%, -70%);
+}
+
+/* Smooth transitions for all toggle icons */
+.wap-accordion-header .wap-icon {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Icon animations on hover */
+.wap-accordion-header:hover .wap-icon {
+    transform: scale(1.1);
+}
+
+.wap-accordion-header.wap-active:hover .wap-icon {
+    transform: scale(1.1);
+}
+
+/* Fallback: Simple text-based icons if CSS shapes don't work */
+.wap-icon-text {
+    font-family: monospace;
+    font-style: normal;
+    text-align: center;
+    line-height: 1;
+    font-size: 14px;
+}
+
+.wap-arrow-down.wap-icon-text:before {
+    content: '↓';
+}
+
+.wap-arrow-up.wap-icon-text:before {
+    content: '↑';
+}
+
+.wap-chevron-down.wap-icon-text:before {
+    content: '⌄';
+}
+
+.wap-chevron-up.wap-icon-text:before {
+    content: '⌃';
+}
+
+.wap-triangle-right.wap-icon-text:before {
+    content: '▶';
+}
+
+.wap-triangle-down.wap-icon-text:before {
+    content: '▼';
+}
+
+/* Debug: Add background to see if icons are positioning correctly */
+.wap-debug-icons .wap-icon {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+}
+
+.wap-debug-icons .wap-icon:before {
+    background: rgba(0, 255, 0, 0.3);
+}
+
+
+
+.wap-arrow-unicode {
+    font-style: normal;
+    line-height: 1;
+    text-align: center;
+    font-size: 18px;
+}
+
+.wap-arrow-unicode:before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    width: auto;
+    height: auto;
+}
+
+.wap-arrow-unicode.wap-arrow-down:before {
+    content: '↓';
+}
+
+.wap-arrow-unicode.wap-arrow-up:before {
+    content: '↑';
+}
+
+/* Keep chevrons as they are for distinction */
+.wap-chevron-unicode {
+    font-style: normal;
+    line-height: 1;
+    text-align: center;
+    font-size: 18px;
+}
+
+.wap-chevron-unicode:before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    width: auto;
+    height: auto;
+}
+
+.wap-chevron-unicode.wap-chevron-down:before {
+    content: '⌄';
+}
+
+.wap-chevron-unicode.wap-chevron-up:before {
+    content: '⌃';
 }

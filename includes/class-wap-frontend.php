@@ -122,8 +122,9 @@ class WAP_Frontend {
         }
 
         $template = get_option('wap_template', 'modern');
+        $toggle_style = get_option('wap_toggle_icon_style', 'plus_minus');
         ?>
-        <div class="wap-accordion-container wap-template-<?php echo esc_attr($template); ?>">
+        <div class="wap-accordion-container wap-template-<?php echo esc_attr($template); ?>" data-toggle-style="<?php echo esc_attr($toggle_style); ?>">
             <div class="wap-accordion">
                 <?php 
                 $index = 0;
@@ -141,7 +142,7 @@ class WAP_Frontend {
                             <?php endif; ?>
                             <span class="wap-accordion-title"><?php echo esc_html($tab['title']); ?></span>
                             <span class="wap-accordion-toggle">
-                                <i class="wap-icon <?php echo $auto_expand ? 'wap-minus' : 'wap-plus'; ?>"></i>
+                                <?php echo $this->get_toggle_icon($toggle_style, $auto_expand); ?>
                             </span>
                         </div>
                         <div class="wap-accordion-content <?php echo $auto_expand ? 'wap-active' : ''; ?>" 
@@ -172,10 +173,11 @@ class WAP_Frontend {
             return;
         }
 
-        // Get settings for CSS variables
+        // Get settings for CSS variables - UPDATED with new variables
         $header_bg = get_option('wap_header_bg_color', '#f8f9fa');
         $header_text = get_option('wap_header_text_color', '#495057');
         $active_bg = get_option('wap_active_header_bg_color', '#0073aa');
+        $active_text = get_option('wap_active_header_text_color', '#ffffff'); // NEW
         $border_color = get_option('wap_border_color', '#dee2e6');
 
         echo '<style>
@@ -186,6 +188,7 @@ class WAP_Frontend {
                 --wap-header-bg: ' . esc_attr($header_bg) . ';
                 --wap-header-text: ' . esc_attr($header_text) . ';
                 --wap-active-bg: ' . esc_attr($active_bg) . ';
+                --wap-active-text: ' . esc_attr($active_text) . '; /* NEW */
                 --wap-border-color: ' . esc_attr($border_color) . ';
                 --wap-animation-duration: ' . esc_attr(get_option('wap_animation_duration', '300')) . 'ms;
             }
@@ -360,6 +363,45 @@ class WAP_Frontend {
         
         return implode(' × ', $dimensions) . ' ' . get_option('woocommerce_dimension_unit');
     }    
+    
+    
+    
+    /**
+     * Get toggle icon based on style - NEW METHOD
+     */
+    private function get_toggle_icon($style, $is_active = false) {
+        switch ($style) {
+        case 'arrow_down':
+            if ($is_active) {
+                return '<i class="wap-icon wap-arrow-unicode wap-arrow-up" aria-label="Collapse"></i>';
+            } else {
+                return '<i class="wap-icon wap-arrow-unicode wap-arrow-down" aria-label="Expand"></i>';
+            }
+            
+        case 'chevron':
+            if ($is_active) {
+                return '<i class="wap-icon wap-chevron-unicode wap-chevron-up" aria-label="Collapse"></i>';
+            } else {
+                return '<i class="wap-icon wap-chevron-unicode wap-chevron-down" aria-label="Expand"></i>';
+            }
+
+            case 'triangle':
+                if ($is_active) {
+                    return '<i class="wap-icon wap-triangle wap-triangle-down" aria-label="Collapse"></i>';
+                } else {
+                    return '<i class="wap-icon wap-triangle wap-triangle-right" aria-label="Expand"></i>';
+                }
+
+            case 'plus_minus':
+            default:
+                if ($is_active) {
+                    return '<i class="wap-icon wap-minus" aria-label="Collapse"></i>';
+                } else {
+                    return '<i class="wap-icon wap-plus" aria-label="Expand"></i>';
+                }
+        }
+    }
+  
     
     
     

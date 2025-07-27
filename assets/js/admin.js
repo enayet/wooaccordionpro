@@ -98,18 +98,21 @@
                     'wap_header_bg_color': '#f8f9fa',
                     'wap_header_text_color': '#495057',
                     'wap_active_header_bg_color': '#0073aa',
+                    'wap_active_header_text_color': '#ffffff',
                     'wap_border_color': '#dee2e6'
                 },
                 'minimal': {
                     'wap_header_bg_color': '#ffffff',
                     'wap_header_text_color': '#333333',
                     'wap_active_header_bg_color': '#6366f1',
+                    'wap_active_header_text_color': '#ffffff',
                     'wap_border_color': '#e5e7eb'
                 },
                 'classic': {
                     'wap_header_bg_color': '#f1f1f1',
                     'wap_header_text_color': '#333333',
                     'wap_active_header_bg_color': '#333333',
+                    'wap_active_header_text_color': '#ffffff',
                     'wap_border_color': '#cccccc'
                 }
             };

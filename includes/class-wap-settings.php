@@ -67,7 +67,9 @@ class WAP_Settings {
         register_setting('wap_settings', 'wap_header_bg_color');
         register_setting('wap_settings', 'wap_header_text_color');
         register_setting('wap_settings', 'wap_active_header_bg_color');
+        register_setting('wap_settings', 'wap_active_header_text_color'); // NEW
         register_setting('wap_settings', 'wap_border_color');
+        register_setting('wap_settings', 'wap_toggle_icon_style'); // NEW
         register_setting('wap_settings', 'wap_animation_duration');
         register_setting('wap_settings', 'wap_enable_mobile_gestures');
     }
@@ -121,6 +123,7 @@ class WAP_Settings {
             'wap_enable_mobile_gestures' => isset($_POST['wap_enable_mobile_gestures']) ? 'yes' : 'no',
             'wap_template' => $new_template,
             'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library'] ?? 'css'),
+            'wap_toggle_icon_style' => sanitize_text_field($_POST['wap_toggle_icon_style'] ?? 'plus_minus'),
             'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration'] ?? '300'),
         );
 
@@ -129,11 +132,12 @@ class WAP_Settings {
             $template_defaults = $this->get_template_defaults($new_template);
             $settings = array_merge($settings, $template_defaults);
         } else {
-            // Use submitted colors
+            // Use submitted colors - FIXED: Make sure to include the new field
             $settings = array_merge($settings, array(
                 'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
                 'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
                 'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
+                'wap_active_header_text_color' => sanitize_hex_color($_POST['wap_active_header_text_color'] ?? '#ffffff'), // FIXED
                 'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
             ));
         }
@@ -276,6 +280,29 @@ class WAP_Settings {
                                         </select>
                                         <p class="description"><?php _e('Choose a pre-designed layout template. Colors will reset to template defaults when changed.', 'wooaccordion-pro'); ?></p>
                                     </div>
+                                    
+                                    
+                                    <!-- NEW: Toggle Icon Style -->
+                                    <div class="wap-form-field">
+                                        <label for="wap_toggle_icon_style"><?php _e('Toggle Icon Style', 'wooaccordion-pro'); ?></label>
+                                        <select id="wap_toggle_icon_style" name="wap_toggle_icon_style">
+                                            <option value="plus_minus" <?php selected(get_option('wap_toggle_icon_style', 'plus_minus'), 'plus_minus'); ?>>
+                                                <?php _e('Plus/Minus (+/−)', 'wooaccordion-pro'); ?>
+                                            </option>
+                                            <option value="arrow_down" <?php selected(get_option('wap_toggle_icon_style'), 'arrow_down'); ?>>
+                                                <?php _e('Arrow Down (↓)', 'wooaccordion-pro'); ?>
+                                            </option>
+                                            <option value="chevron" <?php selected(get_option('wap_toggle_icon_style'), 'chevron'); ?>>
+                                                <?php _e('Chevron (⌄)', 'wooaccordion-pro'); ?>
+                                            </option>
+                                            <option value="triangle" <?php selected(get_option('wap_toggle_icon_style'), 'triangle'); ?>>
+                                                <?php _e('Triangle (▶)', 'wooaccordion-pro'); ?>
+                                            </option>
+                                        </select>
+                                        <p class="description"><?php _e('Choose the icon style for expand/collapse indicators', 'wooaccordion-pro'); ?></p>
+                                    </div>                                    
+                                    
+                                    
 
                                     <div class="wap-form-field">
                                         <label for="wap_header_bg_color"><?php _e('Header Background', 'wooaccordion-pro'); ?></label>
@@ -312,6 +339,21 @@ class WAP_Settings {
                                         </div>
                                         <p class="description"><?php _e('Background color for active/expanded accordion headers', 'wooaccordion-pro'); ?></p>
                                     </div>
+                                    
+                                    <!-- NEW: Active Header Text Color -->
+                                    <div class="wap-form-field">
+                                        <label for="wap_active_header_text_color"><?php _e('Active Header Text Color', 'wooaccordion-pro'); ?></label>
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+                                            <input type="color" id="wap_active_header_text_color" name="wap_active_header_text_color" 
+                                                   value="<?php echo esc_attr(get_option('wap_active_header_text_color', '#ffffff')); ?>" />
+                                            <button type="button" class="button button-small wap-reset-color" data-field="wap_active_header_text_color" data-default="#ffffff">
+                                                <?php _e('Reset', 'wooaccordion-pro'); ?>
+                                            </button>
+                                        </div>
+                                        <p class="description"><?php _e('Text color for active/expanded accordion headers', 'wooaccordion-pro'); ?></p>
+                                    </div>                                    
+                                    
+                                    
 
                                     <div class="wap-form-field">
                                         <label for="wap_border_color"><?php _e('Border Color', 'wooaccordion-pro'); ?></label>
@@ -650,7 +692,6 @@ class WAP_Settings {
      * AJAX handler for saving settings
      */
     public function ajax_save_settings() {
-        // Use check_ajax_referer for proper nonce validation
         check_ajax_referer('wap_admin_nonce', 'nonce');
 
         if (!current_user_can('manage_woocommerce')) {
@@ -665,10 +706,12 @@ class WAP_Settings {
             'wap_enable_mobile_gestures' => isset($_POST['wap_enable_mobile_gestures']) ? 'yes' : 'no',
             'wap_template' => sanitize_text_field($_POST['wap_template'] ?? 'modern'),
             'wap_icon_library' => sanitize_text_field($_POST['wap_icon_library'] ?? 'css'),
+            'wap_toggle_icon_style' => sanitize_text_field($_POST['wap_toggle_icon_style'] ?? 'plus_minus'),
             'wap_animation_duration' => sanitize_text_field($_POST['wap_animation_duration'] ?? '300'),
             'wap_header_bg_color' => sanitize_hex_color($_POST['wap_header_bg_color'] ?? '#f8f9fa'),
             'wap_header_text_color' => sanitize_hex_color($_POST['wap_header_text_color'] ?? '#495057'),
             'wap_active_header_bg_color' => sanitize_hex_color($_POST['wap_active_header_bg_color'] ?? '#0073aa'),
+            'wap_active_header_text_color' => sanitize_hex_color($_POST['wap_active_header_text_color'] ?? '#ffffff'), // FIXED
             'wap_border_color' => sanitize_hex_color($_POST['wap_border_color'] ?? '#dee2e6')
         );
 
@@ -680,79 +723,82 @@ class WAP_Settings {
     }
     
     
-private function render_wp_editor_in_modal() {
-    ?>
-    <div class="wap-form-field">
-        <label for="wap-tab-content"><?php _e('Content', 'wooaccordion-pro'); ?></label>
-        
-        <div class="wap-simple-editor-wrapper">
-            <!-- Simple formatting toolbar -->
-            <div class="wap-simple-toolbar">
-                <button type="button" class="wap-format-btn" data-tag="strong" title="Bold">
-                    <strong>B</strong>
-                </button>
-                <button type="button" class="wap-format-btn" data-tag="em" title="Italic">
-                    <em>I</em>
-                </button>
-                <button type="button" class="wap-format-btn" data-tag="h2" title="Heading 2">
-                    H2
-                </button>
-                <button type="button" class="wap-format-btn" data-tag="h3" title="Heading 3">
-                    H3
-                </button>
-                <button type="button" class="wap-format-btn" data-tag="ul" title="Bullet List">
-                    • List
-                </button>
-                <button type="button" class="wap-format-btn" data-tag="code" title="Code">
-                    &lt;/&gt;
-                </button>
-                <button type="button" class="wap-link-btn" title="Insert Link">
-                    🔗 Link
-                </button>
+    private function render_wp_editor_in_modal() {
+        ?>
+        <div class="wap-form-field">
+            <label for="wap-tab-content"><?php _e('Content', 'wooaccordion-pro'); ?></label>
+
+            <div class="wap-simple-editor-wrapper">
+                <!-- Simple formatting toolbar -->
+                <div class="wap-simple-toolbar">
+                    <button type="button" class="wap-format-btn" data-tag="strong" title="Bold">
+                        <strong>B</strong>
+                    </button>
+                    <button type="button" class="wap-format-btn" data-tag="em" title="Italic">
+                        <em>I</em>
+                    </button>
+                    <button type="button" class="wap-format-btn" data-tag="h2" title="Heading 2">
+                        H2
+                    </button>
+                    <button type="button" class="wap-format-btn" data-tag="h3" title="Heading 3">
+                        H3
+                    </button>
+                    <button type="button" class="wap-format-btn" data-tag="ul" title="Bullet List">
+                        • List
+                    </button>
+                    <button type="button" class="wap-format-btn" data-tag="code" title="Code">
+                        &lt;/&gt;
+                    </button>
+                    <button type="button" class="wap-link-btn" title="Insert Link">
+                        🔗 Link
+                    </button>
+                </div>
+
+                <textarea id="wap-tab-content" name="tab_data[content]" rows="10" class="large-text" 
+                          placeholder="Enter your tab content here. You can use HTML tags for formatting."></textarea>
             </div>
-            
-            <textarea id="wap-tab-content" name="tab_data[content]" rows="10" class="large-text" 
-                      placeholder="Enter your tab content here. You can use HTML tags for formatting."></textarea>
+
+            <p class="description">
+                <?php _e('Tab content supports HTML. Use the buttons above for quick formatting, or type HTML directly.', 'wooaccordion-pro'); ?>
+                <br>
+                <?php _e('Placeholders:', 'wooaccordion-pro'); ?>
+                <code>{product_name}</code>, <code>{product_price}</code>, <code>{product_sku}</code>, 
+                <code>{product_weight}</code>, <code>{product_dimensions}</code>
+            </p>
         </div>
-        
-        <p class="description">
-            <?php _e('Tab content supports HTML. Use the buttons above for quick formatting, or type HTML directly.', 'wooaccordion-pro'); ?>
-            <br>
-            <?php _e('Placeholders:', 'wooaccordion-pro'); ?>
-            <code>{product_name}</code>, <code>{product_price}</code>, <code>{product_sku}</code>, 
-            <code>{product_weight}</code>, <code>{product_dimensions}</code>
-        </p>
-    </div>
-    <?php
-}   
+        <?php
+    }   
     
-/**
- * Get default colors for templates
- */
-private function get_template_defaults($template = 'modern') {
-    $defaults = array(
-        'modern' => array(
-            'wap_header_bg_color' => '#f8f9fa',
-            'wap_header_text_color' => '#495057',
-            'wap_active_header_bg_color' => '#0073aa',
-            'wap_border_color' => '#dee2e6'
-        ),
-        'minimal' => array(
-            'wap_header_bg_color' => '#ffffff',
-            'wap_header_text_color' => '#333333',
-            'wap_active_header_bg_color' => '#6366f1',
-            'wap_border_color' => '#e5e7eb'
-        ),
-        'classic' => array(
-            'wap_header_bg_color' => '#f1f1f1',
-            'wap_header_text_color' => '#333333',
-            'wap_active_header_bg_color' => '#333333',
-            'wap_border_color' => '#cccccc'
-        )
-    );
-    
-    return $defaults[$template] ?? $defaults['modern'];
-}    
+    /**
+     * Get default colors for templates
+     */
+    private function get_template_defaults($template = 'modern') {
+        $defaults = array(
+            'modern' => array(
+                'wap_header_bg_color' => '#f8f9fa',
+                'wap_header_text_color' => '#495057',
+                'wap_active_header_bg_color' => '#0073aa',
+                'wap_active_header_text_color' => '#ffffff', // NEW
+                'wap_border_color' => '#dee2e6'
+            ),
+            'minimal' => array(
+                'wap_header_bg_color' => '#ffffff',
+                'wap_header_text_color' => '#333333',
+                'wap_active_header_bg_color' => '#6366f1',
+                'wap_active_header_text_color' => '#ffffff', // NEW
+                'wap_border_color' => '#e5e7eb'
+            ),
+            'classic' => array(
+                'wap_header_bg_color' => '#f1f1f1',
+                'wap_header_text_color' => '#333333',
+                'wap_active_header_bg_color' => '#333333',
+                'wap_active_header_text_color' => '#ffffff', // NEW
+                'wap_border_color' => '#cccccc'
+            )
+        );
+
+        return $defaults[$template] ?? $defaults['modern'];
+    }   
     
     
     
