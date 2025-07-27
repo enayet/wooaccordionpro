@@ -635,8 +635,10 @@
     cursor: pointer;
     color: #6b7280;
     padding: 0;
+/*
     width: 24px;
     height: 24px;
+*/
     display: flex;
     align-items: center;
     justify-content: center;
@@ -663,7 +665,7 @@
 /* Form Sections in Modal */
 .wap-form-section {
     margin-bottom: 2rem;
-    padding-bottom: 1.5rem;
+/*    padding-bottom: 1.5rem;*/
     border-bottom: 1px solid #f3f4f6;
 }
 
@@ -838,3 +840,6 @@
         grid-row: 1;
     }
 }
+
+
+

@@ -154,19 +154,44 @@ class WAP_Custom_Tabs {
     /**
      * Get available product categories for conditions
      */
-    public function get_product_categories() {
-        $categories = get_terms(array(
-            'taxonomy' => 'product_cat',
-            'hide_empty' => false,
-        ));
+public function get_product_categories() {
+    $categories = get_terms(array(
+        'taxonomy' => 'product_cat',
+        'hide_empty' => false,
+        'orderby' => 'name',
+        'order' => 'ASC'
+    ));
 
-        $options = array();
-        foreach ($categories as $category) {
-            $options[$category->term_id] = $category->name;
-        }
-
-        return $options;
+    if (is_wp_error($categories)) {
+        return array();
     }
+
+    return $this->build_category_hierarchy($categories);
+}
+    
+    
+    
+/**
+ * Build simple hierarchical category structure
+ */
+private function build_category_hierarchy($categories, $parent_id = 0, $level = 0) {
+    $hierarchy = array();
+    
+    foreach ($categories as $category) {
+        if ($category->parent == $parent_id) {
+            // Add simple indentation with dashes
+            $indent = str_repeat('— ', $level);
+            $hierarchy[$category->term_id] = $indent . $category->name;
+            
+            // Get children recursively
+            $children = $this->build_category_hierarchy($categories, $category->term_id, $level + 1);
+            $hierarchy = $hierarchy + $children;
+        }
+    }
+    
+    return $hierarchy;
+}    
+    
 
     /**
      * Get available user roles for conditions

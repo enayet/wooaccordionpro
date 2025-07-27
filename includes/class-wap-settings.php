@@ -488,7 +488,7 @@ class WAP_Settings {
                             <div class="wap-form-field">
                                 <label for="wap-tab-enabled"><?php _e('Status', 'wooaccordion-pro'); ?></label>
                                 <input type="checkbox" id="wap-tab-enabled" name="tab_data[enabled]" value="1" checked />
-                                <span><?php _e('Enable this tab', 'wooaccordion-pro'); ?></span>
+                                <p class="description"><?php _e('Enable this tab', 'wooaccordion-pro'); ?></p>
                             </div>
                         </div>
 
