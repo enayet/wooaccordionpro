@@ -2,7 +2,7 @@
 /**
  * WooAccordion Pro Frontend Class
  * 
- * Handles frontend accordion rendering
+ * Handles frontend accordion rendering with proper custom tab
  */
 
 if (!defined('ABSPATH')) {
@@ -47,7 +47,7 @@ class WAP_Frontend {
     }
 
     /**
-     * Replace product tabs with accordion data
+     * Replace product tabs with accordion data - FIXED WITH PRIORITY SORTING
      */
     public function replace_product_tabs($tabs) {
         if (!is_product()) {
@@ -57,12 +57,80 @@ class WAP_Frontend {
         // Add custom tabs to the existing tabs
         $tabs = $this->add_custom_tabs_to_product_tabs($tabs);
 
+        // IMPORTANT: Sort tabs by priority (this was missing!)
+        $tabs = $this->sort_tabs_by_priority($tabs);
+
         // Store tabs for accordion conversion
         global $wap_accordion_tabs;
         $wap_accordion_tabs = $tabs;
 
         // Return empty to hide default tabs
         return array();
+    }
+
+    /**
+     * Sort tabs by priority - NEW METHOD TO FIX PRIORITY ISSUE
+     */
+    private function sort_tabs_by_priority($tabs) {
+        // Convert to array with priority for sorting
+        $sortable_tabs = array();
+        
+        foreach ($tabs as $key => $tab) {
+            $priority = isset($tab['priority']) ? $tab['priority'] : 50;
+            $sortable_tabs[] = array(
+                'key' => $key,
+                'tab' => $tab,
+                'priority' => $priority
+            );
+        }
+
+        // Sort by priority (lower numbers first)
+        usort($sortable_tabs, function($a, $b) {
+            if ($a['priority'] == $b['priority']) {
+                return 0;
+            }
+            return ($a['priority'] < $b['priority']) ? -1 : 1;
+        });
+
+        // Rebuild tabs array in correct order
+        $sorted_tabs = array();
+        foreach ($sortable_tabs as $item) {
+            $sorted_tabs[$item['key']] = $item['tab'];
+        }
+
+        return $sorted_tabs;
+    }
+
+    /**
+     * Add custom tabs to product tabs - IMPROVED WITH BETTER PRIORITY HANDLING
+     */
+    private function add_custom_tabs_to_product_tabs($tabs) {
+        global $product;
+        
+        if (!$product || !class_exists('WAP_Custom_Tabs')) {
+            return $tabs;
+        }
+
+        $custom_tabs_manager = WAP_Custom_Tabs::instance();
+        $custom_tabs = $custom_tabs_manager->get_custom_tabs();
+        
+        foreach ($custom_tabs as $tab_id => $tab_data) {
+            // Check if tab should be displayed for this product
+            if ($this->should_display_custom_tab($tab_data, $product)) {
+                // Ensure priority is set and is numeric
+                $priority = isset($tab_data['priority']) ? intval($tab_data['priority']) : 50;
+                
+                $tabs['custom_' . $tab_id] = array(
+                    'title' => $tab_data['title'],
+                    'priority' => $priority, // Make sure priority is properly set
+                    'callback' => array($this, 'custom_tab_content'),
+                    'tab_data' => $tab_data
+                );
+
+            }
+        }
+
+        return $tabs;
     }
 
     /**
@@ -85,7 +153,7 @@ class WAP_Frontend {
         if (get_option('wap_icon_library') === 'fontawesome') {
             wp_enqueue_style(
                 'wap-fontawesome',
-                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+                WAP_PLUGIN_URL . 'assets/css/font-awesome/all.min.css',
                 array(),
                 '6.0.0'
             );
@@ -112,7 +180,7 @@ class WAP_Frontend {
     }
 
     /**
-     * Output accordion HTML
+     * Output accordion HTML - IMPROVED WITH DEBUG INFO
      */
     public function output_accordion() {
         global $wap_accordion_tabs;
@@ -123,6 +191,7 @@ class WAP_Frontend {
 
         $template = get_option('wap_template', 'modern');
         $toggle_style = get_option('wap_toggle_icon_style', 'plus_minus');
+        
         ?>
         <div class="wap-accordion-container wap-template-<?php echo esc_attr($template); ?>" data-toggle-style="<?php echo esc_attr($toggle_style); ?>">
             <div class="wap-accordion">
@@ -137,12 +206,14 @@ class WAP_Frontend {
                              data-target="<?php echo esc_attr($key); ?>">
                             <?php if (get_option('wap_show_icons', 'yes') === 'yes') : ?>
                                 <span class="wap-accordion-icon">
-                                    <?php echo $this->get_accordion_icon($key); ?>
+                                    <?php echo wp_kses_post($this->get_accordion_icon($key)); ?>
                                 </span>
                             <?php endif; ?>
-                            <span class="wap-accordion-title"><?php echo esc_html($tab['title']); ?></span>
+                            <span class="wap-accordion-title">
+                                <?php echo esc_html($tab['title']); ?>
+                            </span>
                             <span class="wap-accordion-toggle">
-                                <?php echo $this->get_toggle_icon($toggle_style, $auto_expand); ?>
+                                <?php echo wp_kses_post($this->get_toggle_icon($toggle_style, $auto_expand)); ?>
                             </span>
                         </div>
                         <div class="wap-accordion-content <?php echo $auto_expand ? 'wap-active' : ''; ?>" 
@@ -220,40 +291,7 @@ class WAP_Frontend {
             return isset($icons[$section]) ? $icons[$section] : '<span class="wap-css-icon wap-icon-file"></span>';
         }
     }
-    
-    
-  
-    
-    
-    /**
-     * Add custom tabs to product tabs
-     */
-    private function add_custom_tabs_to_product_tabs($tabs) {
-        global $product;
-        
-        if (!$product || !class_exists('WAP_Custom_Tabs')) {
-            return $tabs;
-        }
-
-        $custom_tabs_manager = WAP_Custom_Tabs::instance();
-        $custom_tabs = $custom_tabs_manager->get_custom_tabs();
-        
-        foreach ($custom_tabs as $tab_id => $tab_data) {
-            // Check if tab should be displayed for this product
-            if ($this->should_display_custom_tab($tab_data, $product)) {
-                $tabs['custom_' . $tab_id] = array(
-                    'title' => $tab_data['title'],
-                    'priority' => isset($tab_data['priority']) ? $tab_data['priority'] : 50,
-                    'callback' => array($this, 'custom_tab_content'),
-                    'tab_data' => $tab_data
-                );
-            }
-        }
-
-        return $tabs;
-    }    
-    
-    
+      
     /**
      * Check if custom tab should be displayed
      */
@@ -317,7 +355,6 @@ class WAP_Frontend {
         echo '</div>';
     }
     
-    
     /**
      * Process dynamic content (shortcodes, placeholders)
      */
@@ -364,8 +401,6 @@ class WAP_Frontend {
         return implode(' × ', $dimensions) . ' ' . get_option('woocommerce_dimension_unit');
     }    
     
-    
-    
     /**
      * Get toggle icon based on style - NEW METHOD
      */
@@ -401,8 +436,4 @@ class WAP_Frontend {
                 }
         }
     }
-  
-    
-    
-    
 }

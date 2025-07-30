@@ -109,7 +109,8 @@ class WAP_Custom_Tabs {
      */
     public function ajax_save_custom_tab() {
         // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wap_admin_nonce')) {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce, 'wap_admin_nonce')) {
             wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
         }
 
@@ -117,11 +118,8 @@ class WAP_Custom_Tabs {
             wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
         }
 
-        $tab_id = sanitize_text_field($_POST['tab_id'] ?? '');
-        $tab_data = $_POST['tab_data'] ?? array();
-
-        // Debug: Log received data
-        error_log('WAP Custom Tab Save - Received data: ' . print_r($_POST, true));
+        $tab_id = isset($_POST['tab_id']) ? sanitize_text_field(wp_unslash($_POST['tab_id'])) : '';
+        $tab_data = isset($_POST['tab_data']) ? sanitize_text_field(wp_unslash($_POST['tab_data'])) : array();
 
         // Validate required fields
         if (empty($tab_data['title'])) {
@@ -144,7 +142,8 @@ class WAP_Custom_Tabs {
      */
     public function ajax_delete_custom_tab() {
         // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wap_admin_nonce')) {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce ?? '', 'wap_admin_nonce')) {
             wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
         }
 
@@ -152,7 +151,7 @@ class WAP_Custom_Tabs {
             wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
         }
 
-        $tab_id = sanitize_text_field($_POST['tab_id'] ?? '');
+        $tab_id = isset($_POST['tab_id']) ? sanitize_text_field(wp_unslash($_POST['tab_id'])) : '';
 
         if ($this->delete_custom_tab($tab_id)) {
             wp_send_json_success(array('message' => __('Custom tab deleted successfully!', 'wooaccordion-pro')));
@@ -166,7 +165,8 @@ class WAP_Custom_Tabs {
      */
     public function ajax_get_custom_tab() {
         // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'wap_admin_nonce')) {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+        if (!wp_verify_nonce($nonce ?? '', 'wap_admin_nonce')) {
             wp_send_json_error(array('message' => __('Security check failed', 'wooaccordion-pro')));
         }
 
@@ -174,12 +174,10 @@ class WAP_Custom_Tabs {
             wp_send_json_error(array('message' => __('Insufficient permissions', 'wooaccordion-pro')));
         }
 
-        $tab_id = sanitize_text_field($_POST['tab_id'] ?? '');
+        $tab_id = isset($_POST['tab_id']) ? sanitize_text_field(wp_unslash($_POST['tab_id'])) : '';
         $custom_tabs = $this->get_custom_tabs();
 
         if (isset($custom_tabs[$tab_id])) {
-            // Debug: Log the data being sent
-            error_log('WAP Custom Tab Get - Sending data for tab ' . $tab_id . ': ' . print_r($custom_tabs[$tab_id], true));
             
             wp_send_json_success(array('tab_data' => $custom_tabs[$tab_id]));
         } else {

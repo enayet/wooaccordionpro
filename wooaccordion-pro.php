@@ -131,8 +131,11 @@ final class WooAccordionPro {
      */
     public function woocommerce_missing_notice() {
         echo '<div class="error"><p><strong>' . 
-             sprintf(__('WooAccordion Pro requires WooCommerce to be installed and active. You can download %s here.', 'wooaccordion-pro'), 
-             '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>') . 
+             wp_kses_post(
+                /* translators: %s: WooCommerce download link */
+                sprintf(__('WooAccordion Pro requires WooCommerce to be installed and active. You can download %s here.', 'wooaccordion-pro'), 
+                '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>') 
+             ). 
              '</strong></p></div>';
     }
 }
