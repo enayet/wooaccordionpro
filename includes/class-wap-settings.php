@@ -175,9 +175,6 @@ class WAP_Settings {
                 true
             );
             
-            // Enqueue WordPress editor assets
-            wp_enqueue_editor(); 
-
             wp_localize_script('wap-admin-js', 'wap_admin', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('wap_admin_nonce'),

@@ -25,6 +25,7 @@
     margin: 0 0 0.5rem 0;
     font-size: 1.8rem;
     font-weight: 600;
+    line-height: 1;
 }
 
 .wap-admin-header-content p {
@@ -51,6 +52,7 @@
     font-size: 2rem;
     font-weight: 800;
     color: #fbbf24;
+    line-height: 1;
 }
 
 .wap-stat-label {
@@ -991,4 +993,9 @@
         padding: 3px 6px;
         font-size: 11px;
     }
+}
+
+.wap-admin-wrap .notice.notice-error,
+.wap-admin-wrap notice.notice-warning {
+    display: none !important;
 }

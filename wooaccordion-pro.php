@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('WAP_VERSION', '1.0.6');
+define('WAP_VERSION', '1.0.0');
 define('WAP_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('WAP_PLUGIN_PATH', plugin_dir_path(__FILE__));
 
@@ -71,7 +71,7 @@ final class WooAccordionPro {
             add_action('admin_notices', array($this, 'woocommerce_missing_notice'));
             return;
         }
-    }
+    }    
 
     /**
      * Load text domain
