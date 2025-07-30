@@ -23,6 +23,9 @@
          * Initialize tab functionality
          */
         initTabs() {
+            
+            $(".wap-admin-wrap .notice.notice-error").remove();
+            
             $('.wap-tab-button').on('click', (e) => {
                 e.preventDefault();
                 const targetTab = $(e.currentTarget).data('tab');
