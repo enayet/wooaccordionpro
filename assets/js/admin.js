@@ -424,7 +424,7 @@
          */
         saveCustomTab() {
             const $saveButton = $('#wap-save-custom-tab');
-            
+
             const title = $('#wap-tab-title').val().trim();
             if (!title) {
                 this.showModalMessage('error', 'Tab title is required');
@@ -436,30 +436,40 @@
             $('.wap-modal-message').hide();
 
             const tabId = $('#wap-tab-id').val();
+
+            // Ensure conditions arrays are properly formatted
+            const categories = $('#wap-tab-categories').val();
+            const userRoles = $('#wap-tab-user-roles').val();
+            const productTypes = $('#wap-tab-product-types').val();
+
             const formData = {
                 action: 'wap_save_custom_tab',
                 nonce: this.settings.nonce,
                 tab_id: tabId,
                 tab_data: {
                     title: title,
-                    content: this.getEditorContent(), // Get content using simplified method
+                    content: this.getEditorContent(),
                     priority: parseInt($('#wap-tab-priority').val()) || 50,
-                    enabled: $('#wap-tab-enabled').is(':checked'),
+                    enabled: $('#wap-tab-enabled').is(':checked') ? 1 : 0,
                     conditions: {
-                        categories: $('#wap-tab-categories').val() || [],
-                        user_roles: $('#wap-tab-user-roles').val() || [],
-                        product_types: $('#wap-tab-product-types').val() || []
+                        categories: Array.isArray(categories) ? categories : (categories ? [categories] : []),
+                        user_roles: Array.isArray(userRoles) ? userRoles : (userRoles ? [userRoles] : []),
+                        product_types: Array.isArray(productTypes) ? productTypes : (productTypes ? [productTypes] : [])
                     }
                 }
             };
 
+            // Debug logging
+            console.log('Saving tab data:', formData);
+
             $.post(this.settings.ajax_url, formData)
                 .done((response) => {
                     this.setLoadingState($saveButton, false);
+                    console.log('Save response:', response);
 
                     if (response.success) {
                         this.showModalMessage('success', response.data.message);
-                        
+
                         setTimeout(() => {
                             this.closeTabEditor();
                             window.location.reload();
@@ -470,6 +480,7 @@
                 })
                 .fail((xhr, status, error) => {
                     this.setLoadingState($saveButton, false);
+                    console.error('AJAX error:', error, xhr.responseText);
                     this.showModalMessage('error', 'Network error occurred: ' + error);
                 });
         }

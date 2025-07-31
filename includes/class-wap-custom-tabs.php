@@ -119,11 +119,20 @@ class WAP_Custom_Tabs {
         }
 
         $tab_id = isset($_POST['tab_id']) ? sanitize_text_field(wp_unslash($_POST['tab_id'])) : '';
-        $tab_data = isset($_POST['tab_data']) ? sanitize_text_field(wp_unslash($_POST['tab_data'])) : array();
+        
+        // FIX: Don't sanitize the entire tab_data array as text
+        $tab_data = isset($_POST['tab_data']) ? wp_unslash($_POST['tab_data']) : array();
+        
+        // Additional validation for tab_data structure
+        if (!is_array($tab_data)) {
+            wp_send_json_error(array('message' => __('Invalid tab data format', 'wooaccordion-pro')));
+            return;
+        }
 
         // Validate required fields
         if (empty($tab_data['title'])) {
             wp_send_json_error(array('message' => __('Tab title is required', 'wooaccordion-pro')));
+            return;
         }
 
         if ($this->save_custom_tab($tab_id, $tab_data)) {
