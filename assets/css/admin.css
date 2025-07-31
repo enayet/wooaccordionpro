@@ -352,8 +352,9 @@
 }
 
 .wap-upgrade-box .button-primary:hover {
-    background: #f8fafc;
+    background: #135e96;
     transform: translateY(-1px);
+    text-decoration: none;
 }
 
 /* Notices */

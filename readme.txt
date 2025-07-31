@@ -158,7 +158,6 @@ Transform your WooCommerce store with mobile-first accordions. Boost conversions
 * Flatsome
 * Divi
 * Avada
-* And 40+ more themes
 
 **Performance:**
 * Lightweight code (< 50KB total)

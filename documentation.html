@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WooAccordion Pro - Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --text: #1f2937;
+            --text-light: #6b7280;
+            --bg: #ffffff;
+            --bg-alt: #f9fafb;
+            --border: #e5e7eb;
+            --code-bg: #1f2937;
+            --code-text: #f9fafb;
+            --success: #065f46;
+            --warning: #92400e;
+            --info: #1e40af;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: var(--bg-alt);
+            padding: 2rem 1.5rem;
+            border-right: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 0.75rem;
+            color: var(--text);
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: none;
+        }
+
+        .header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .section {
+            margin-bottom: 3rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section h3 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 2rem 0 1rem 0;
+        }
+
+        .section h4 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 1.5rem 0 0.75rem 0;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .inline-code {
+            background: #f1f5f9;
+            color: var(--primary);
+            padding: 0.125rem 0.375rem;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #eff6ff;
+            border-color: var(--info);
+            color: var(--info);
+        }
+
+        .alert-success {
+            background: #ecfdf5;
+            border-color: var(--secondary);
+            color: var(--success);
+        }
+
+        .alert-warning {
+            background: #fffbeb;
+            border-color: var(--accent);
+            color: var(--warning);
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            background: var(--bg-alt);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Lists */
+        .content ul,
+        .content ol {
+            padding-left: 1.5rem;
+            margin: 1rem 0;
+        }
+
+        .content li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Images */
+        .screenshot {
+            width: 100%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: 1rem 0;
+            border: 1px solid var(--border);
+        }
+
+        /* Quick Start Cards */
+        .quick-start-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .quick-start-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .quick-start-card h4 {
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+
+            .sidebar {
+                position: static;
+                height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="logo">WooAccordion Pro</div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Getting Started</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#overview" class="nav-link">Overview</a></li>
+                    <li class="nav-item"><a href="#installation" class="nav-link">Installation</a></li>
+                    <li class="nav-item"><a href="#quick-setup" class="nav-link">Quick Setup</a></li>
+                    <li class="nav-item"><a href="#requirements" class="nav-link">Requirements</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Configuration</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#basic-settings" class="nav-link">Basic Settings</a></li>
+                    <li class="nav-item"><a href="#styling-options" class="nav-link">Styling Options</a></li>
+                    <li class="nav-item"><a href="#mobile-features" class="nav-link">Mobile Features</a></li>
+                    <li class="nav-item"><a href="#custom-tabs" class="nav-link">Custom Tabs</a></li>
+                </ul>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-title">Support</div>
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#troubleshooting" class="nav-link">Troubleshooting</a></li>
+                    <li class="nav-item"><a href="#faq" class="nav-link">FAQ</a></li>
+                    <li class="nav-item"><a href="#support" class="nav-link">Get Support</a></li>
+                    <li class="nav-item"><a href="#changelog" class="nav-link">Changelog</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <h1>WooAccordion Pro Documentation</h1>
+                <p>Complete guide to setting up and customizing your WooCommerce product accordions</p>
+            </div>
+
+            <div class="content">
+                <!-- Overview -->
+                <section id="overview" class="section">
+                    <h2>Overview</h2>
+                    <p>WooAccordion Pro transforms your traditional WooCommerce product tabs into beautiful, mobile-optimized accordions. With smooth animations, customizable styling, and built-in custom tab management, it's designed to improve your customers' shopping experience and boost conversions.</p>
+
+                    <div class="alert alert-info">
+                        <strong>Key Benefits:</strong> 40% higher mobile conversions, better user experience, advanced customization options, and custom tab management.
+                    </div>
+
+                    <h3>What's Included</h3>
+                    <ul>
+                        <li><strong>Accordion Conversion:</strong> Transform existing WooCommerce tabs to accordions</li>
+                        <li><strong>Smooth Animations:</strong> Customizable animation speeds and styles</li>
+                        <li><strong>Multiple Icon Styles:</strong> CSS icons and FontAwesome support</li>
+                        <li><strong>Advanced Styling:</strong> Complete color customization with template presets</li>
+                        <li><strong>Custom Tab Manager:</strong> Create and manage custom accordion tabs with conditional logic</li>
+                        <li><strong>Mobile Optimization:</strong> Touch gestures and responsive design</li>
+                        <li><strong>Template System:</strong> Choose from Modern, Minimal, or Classic templates</li>
+                    </ul>
+                </section>
+
+                <!-- Installation -->
+                <section id="installation" class="section">
+                    <h2>Installation</h2>
+                    
+                    <h3>Automatic Installation (Recommended)</h3>
+                    <div class="quick-start-grid">
+                        <div class="quick-start-card">
+                            <h4><span class="step-number">1</span>Download Plugin</h4>
+                            <p>Download the WooAccordion Pro plugin file from your purchase confirmation email.</p>
+                        </div>
+                        <div class="quick-start-card">
+                            <h4><span class="step-number">2</span>Upload to WordPress</h4>
+                            <p>Go to Plugins → Add New → Upload Plugin and select the downloaded file.</p>
+                        </div>
+                        <div class="quick-start-card">
+                            <h4><span class="step-number">3</span>Activate Plugin</h4>
+                            <p>Click "Activate Plugin" after successful upload.</p>
+                        </div>
+                    </div>
+
+                    <h3>Manual Installation via FTP</h3>
+                    <ol>
+                        <li>Extract the <span class="inline-code">wooaccordion-pro.zip</span> file</li>
+                        <li>Upload the <span class="inline-code">wooaccordion-pro</span> folder to <span class="inline-code">/wp-content/plugins/</span></li>
+                        <li>Activate the plugin through the WordPress admin panel</li>
+                    </ol>
+
+                    <div class="alert alert-success">
+                        <strong>Installation Complete!</strong> You'll find the settings under WooCommerce → Accordions.
+                    </div>
+                </section>
+
+                <!-- Quick Setup -->
+                <section id="quick-setup" class="section">
+                    <h2>Quick Setup (3 Minutes)</h2>
+                    
+                    <h3>Step 1: Enable Accordions</h3>
+                    <ol>
+                        <li>Navigate to <strong>WooCommerce → Accordions</strong></li>
+                        <li>Check "Enable Accordions" to replace default tabs</li>
+                        <li>Click "Save Settings"</li>
+                    </ol>
+
+                    <div class="code-block">
+// Your product tabs are now automatically converted to accordions!
+// Visit any product page to see the change.</div>
+
+                    <h3>Step 2: Choose Your Style</h3>
+                    <ol>
+                        <li>In the Styling tab, select your preferred <strong>Template Style</strong></li>
+                        <li>Choose your <strong>Toggle Icon Style</strong> (Plus/Minus, Arrow, Chevron, or Triangle)</li>
+                        <li>Customize colors to match your theme using the color pickers</li>
+                    </ol>
+
+                    <h3>Step 3: Test on Mobile</h3>
+                    <ol>
+                        <li>Open a product page on your mobile device</li>
+                        <li>Test the touch gestures (tap to expand/collapse)</li>
+                        <li>Verify the responsive design looks good</li>
+                    </ol>
+
+                    <div class="alert alert-info">
+                        <strong>Pro Tip:</strong> Use Chrome DevTools' mobile simulator to quickly test different screen sizes.
+                    </div>
+                </section>
+
+                <!-- Requirements -->
+                <section id="requirements" class="section">
+                    <h2>System Requirements</h2>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Requirement</th>
+                                <th>Minimum</th>
+                                <th>Recommended</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>WordPress Version</td>
+                                <td>5.0+</td>
+                                <td>6.0+</td>
+                            </tr>
+                            <tr>
+                                <td>WooCommerce Version</td>
+                                <td>4.0+</td>
+                                <td>8.0+</td>
+                            </tr>
+                            <tr>
+                                <td>PHP Version</td>
+                                <td>7.4+</td>
+                                <td>8.1+</td>
+                            </tr>
+                            <tr>
+                                <td>Memory Limit</td>
+                                <td>128MB</td>
+                                <td>256MB+</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Compatible Themes</h3>
+                    <p>WooAccordion Pro works with any properly coded WordPress theme. Tested extensively with:</p>
+                    <ul>
+                        <li>Storefront (WooCommerce default)</li>
+                        <li>Astra</li>
+                        <li>OceanWP</li>
+                        <li>GeneratePress</li>
+                        <li>Flatsome</li>
+                        <li>Divi</li>
+                    </ul>
+                </section>
+
+                <!-- Basic Settings -->
+                <section id="basic-settings" class="section">
+                    <h2>Basic Settings</h2>
+                    
+                    <h3>General Options</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Setting</th>
+                                <th>Description</th>
+                                <th>Default</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Enable Accordions</td>
+                                <td>Replace WooCommerce tabs with accordions</td>
+                                <td>Enabled</td>
+                            </tr>
+                            <tr>
+                                <td>Auto Expand First</td>
+                                <td>Automatically expand the first accordion item</td>
+                                <td>Enabled</td>
+                            </tr>
+                            <tr>
+                                <td>Allow Multiple Open</td>
+                                <td>Allow multiple accordion items to be open simultaneously</td>
+                                <td>Disabled</td>
+                            </tr>
+                            <tr>
+                                <td>Show Icons</td>
+                                <td>Display icons next to accordion headers</td>
+                                <td>Enabled</td>
+                            </tr>
+                            <tr>
+                                <td>Icon Library</td>
+                                <td>Choose between CSS icons (lightweight) or FontAwesome</td>
+                                <td>CSS Icons</td>
+                            </tr>
+                            <tr>
+                                <td>Animation Speed</td>
+                                <td>Control how fast accordions open and close</td>
+                                <td>Normal (300ms)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert alert-info">
+                        <strong>Performance Tip:</strong> CSS Icons are lightweight and load faster than FontAwesome, making them ideal for performance-focused sites.
+                    </div>
+                </section>
+
+                <!-- Styling Options -->
+                <section id="styling-options" class="section">
+                    <h2>Styling Options</h2>
+                    
+                    <h3>Template Styles</h3>
+                    <div class="quick-start-grid">
+                        <div class="quick-start-card">
+                            <h4>Modern Card</h4>
+                            <p>Clean, card-based design with subtle shadows and rounded corners. Perfect for modern e-commerce sites.</p>
+                        </div>
+                        <div class="quick-start-card">
+                            <h4>Minimal Flat</h4>
+                            <p>Flat design with clean lines and minimal visual elements. Great for minimalist themes.</p>
+                        </div>
+                        <div class="quick-start-card">
+                            <h4>Classic</h4>
+                            <p>Traditional styling with borders and conventional spacing. Ideal for established brands.</p>
+                        </div>
+                    </div>
+
+                    <h3>Toggle Icon Styles</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Style</th>
+                                <th>Icons Used</th>
+                                <th>Best For</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Plus/Minus</td>
+                                <td>+ / −</td>
+                                <td>Universal, clear indication</td>
+                            </tr>
+                            <tr>
+                                <td>Arrow Down</td>
+                                <td>↓ / ↑</td>
+                                <td>Directional, intuitive</td>
+                            </tr>
+                            <tr>
+                                <td>Chevron</td>
+                                <td>⌄ / ⌃</td>
+                                <td>Modern, subtle</td>
+                            </tr>
+                            <tr>
+                                <td>Triangle</td>
+                                <td>▶ / ▼</td>
+                                <td>Classic, distinctive</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Color Customization</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Element</th>
+                                <th>Description</th>
+                                <th>Reset Option</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Header Background</td>
+                                <td>Accordion header background color</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Header Text Color</td>
+                                <td>Accordion header text color</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Active Header Background</td>
+                                <td>Background color when accordion is expanded</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Active Header Text Color</td>
+                                <td>Text color when accordion is expanded</td>
+                                <td>✓</td>
+                            </tr>
+                            <tr>
+                                <td>Border Color</td>
+                                <td>Border color for accordion items</td>
+                                <td>✓</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="alert alert-success">
+                        <strong>Smart Templates:</strong> When you change templates, colors automatically reset to match the template's default color scheme.
+                    </div>
+                </section>
+
+                <!-- Mobile Features -->
+                <section id="mobile-features" class="section">
+                    <h2>Mobile Features</h2>
+                    
+                    <h3>Touch Gestures</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Gesture</th>
+                                <th>Action</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tap</td>
+                                <td>Expand/collapse accordion</td>
+                                <td>Always enabled</td>
+                            </tr>
+                            <tr>
+                                <td>Swipe Gestures</td>
+                                <td>Enhanced touch interactions</td>
+                                <td>Configurable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3>Responsive Design</h3>
+                    <ul>
+                        <li><strong>Mobile (< 768px):</strong> Optimized touch targets and spacing</li>
+                        <li><strong>Tablet (768px - 1024px):</strong> Balanced design for medium screens</li>
+                        <li><strong>Desktop (> 1024px):</strong> Full accordion functionality</li>
+                    </ul>
+
+                    <h3>Mobile Settings</h3>
+                    <p>Enable Touch Gestures in the Mobile tab to allow enhanced swipe interactions on mobile devices. This feature is optimized for better mobile user experience.</p>
+
+                    <div class="alert alert-info">
+                        <strong>Mobile First:</strong> The plugin is designed with mobile users in mind, as 75% of e-commerce traffic comes from mobile devices.
+                    </div>
+                </section>
+
+                <!-- Custom Tabs -->
+                <section id="custom-tabs" class="section">
+                    <h2>Custom Tabs Manager</h2>
+                    
+                    <h3>Creating Custom Tabs</h3>
+                    <p>The Custom Tabs Manager allows you to create unlimited custom accordion sections with rich content and conditional display logic.</p>
+
+                    <h4>Adding a New Tab</h4>
+                    <ol>
+                        <li>Go to WooCommerce → Accordions → Custom Tabs</li>
+                        <li>Click "Add New Tab"</li>
+                        <li>Fill in the basic information:</li>
+                        <ul>
+                            <li><strong>Tab Title:</strong> The heading that appears in the accordion</li>
+                            <li><strong>Priority:</strong> Controls display order (1-100, lower numbers first)</li>
+                            <li><strong>Status:</strong> Enable or disable the tab</li>
+                        </ul>
+                        <li>Add your content using the HTML editor</li>
+                        <li>Set display conditions (optional)</li>
+                        <li>Save the tab</li>
+                    </ol>
+
+                    <h3>Content Editor</h3>
+                    <p>The custom tab content editor supports HTML and includes formatting buttons for:</p>
+                    <ul>
+                        <li><strong>Bold</strong> and <em>Italic</em> text</li>
+                        <li>Headings (H2, H3)</li>
+                        <li>Bullet lists</li>
+                        <li>Code formatting</li>
+                        <li>Links</li>
+                    </ul>
+
+                    <h4>Dynamic Placeholders</h4>
+                    <p>Use these placeholders in your content for dynamic product information:</p>
+                    <div class="code-block">{product_name} - Display the product name
+{product_price} - Show the product price
+{product_sku} - Display the SKU
+{product_weight} - Show product weight
+{product_dimensions} - Display dimensions</div>
+
+                    <h3>Conditional Display Logic</h3>
+                    <p>Control when and where your custom tabs appear:</p>
+
+                    <h4>Product Categories</h4>
+                    <p>Show tabs only for products in specific categories. Great for category-specific information like:</p>
+                    <ul>
+                        <li>Electronics → Warranty & Tech Support</li>
+                        <li>Clothing → Size Guide & Care Instructions</li>
+                        <li>Books → Author Bio & Reviews</li>
+                    </ul>
+
+                    <h4>User Roles</h4>
+                    <p>Display different content based on user roles:</p>
+                    <ul>
+                        <li><strong>Customers:</strong> Standard product information</li>
+                        <li><strong>Wholesale:</strong> Bulk pricing and trade terms</li>
+                        <li><strong>Administrators:</strong> Internal notes and management info</li>
+                    </ul>
+
+                    <h4>Product Types</h4>
+                    <p>Show tabs only for specific product types:</p>
+                    <ul>
+                        <li>Simple products</li>
+                        <li>Variable products</li>
+                        <li>Grouped products</li>
+                        <li>External products</li>
+                    </ul>
+
+                    <div class="alert alert-success">
+                        <strong>Powerful Combinations:</strong> You can combine multiple conditions. For example, show a "Bulk Pricing" tab only for wholesale users viewing electronics products.
+                    </div>
+                </section>
+
+                <!-- Troubleshooting -->
+                <section id="troubleshooting" class="section">
+                    <h2>Troubleshooting</h2>
+                    
+                    <h3>Common Issues</h3>
+                    
+                    <h4>Accordions Not Showing</h4>
+                    <div class="alert alert-warning">
+                        <strong>Problem:</strong> Accordions don't appear on product pages
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Verify plugin is activated in <span class="inline-code">Plugins → Installed Plugins</span></li>
+                        <li>Check that "Enable Accordions" is checked in <span class="inline-code">WooCommerce → Accordions → General</span></li>
+                        <li>Clear any caching plugins</li>
+                        <li>Test with a different theme to check for theme conflicts</li>
+                    </ol>
+
+                    <h4>Styling Issues</h4>
+                    <div class="alert alert-warning">
+                        <strong>Problem:</strong> Accordions look broken or unstyled
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Try different template styles (Modern, Minimal, Classic)</li>
+                        <li>Reset colors to template defaults using the reset buttons</li>
+                        <li>Check if your theme has conflicting CSS</li>
+                        <li>Clear browser cache and refresh the page</li>
+                    </ol>
+
+                    <h4>JavaScript Errors</h4>
+                    <div class="alert alert-warning">
+                        <strong>Problem:</strong> Accordions don't expand/collapse
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Check browser console for JavaScript errors (F12 → Console)</li>
+                        <li>Deactivate other plugins to test for conflicts</li>
+                        <li>Ensure jQuery is loaded properly</li>
+                        <li>Clear browser cache and test in incognito mode</li>
+                    </ol>
+
+                    <h4>Custom Tabs Not Saving</h4>
+                    <div class="alert alert-warning">
+                        <strong>Problem:</strong> Custom tab content doesn't save properly
+                    </div>
+                    <p><strong>Solutions:</strong></p>
+                    <ol>
+                        <li>Ensure you have proper permissions (manage_woocommerce capability)</li>
+                        <li>Check that the tab title is filled in (required field)</li>
+                        <li>Try saving without special characters in the content</li>
+                        <li>Clear any page caching</li>
+                    </ol>
+
+                    <h3>Debug Mode</h3>
+                    <p>Enable debug mode to troubleshoot issues:</p>
+                    <div class="code-block">// Add to wp-config.php
+define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+
+// Check debug log at: /wp-content/debug.log</div>
+
+                    <h3>Theme Compatibility</h3>
+                    <p>If your theme isn't fully compatible:</p>
+                    <ol>
+                        <li>Contact theme developer for WooCommerce compatibility</li>
+                        <li>Test with a default WordPress theme (Twenty Twenty-Four)</li>
+                        <li>Consider switching to a WooCommerce-certified theme</li>
+                    </ol>
+
+                    <div class="alert alert-info">
+                        <strong>Still Need Help?</strong> Contact our support team with your site URL, theme name, and detailed description of the issue.
+                    </div>
+                </section>
+
+                <!-- FAQ -->
+                <section id="faq" class="section">
+                    <h2>Frequently Asked Questions</h2>
+                    
+                    <h3>General Questions</h3>
+                    
+                    <h4>Q: Will this work with my theme?</h4>
+                    <p><strong>A:</strong> WooAccordion Pro works with any properly coded WordPress theme that supports WooCommerce. We've tested it with 50+ popular themes including Storefront, Astra, OceanWP, and Divi.</p>
+
+                    <h4>Q: Does it affect site performance?</h4>
+                    <p><strong>A:</strong> No, the plugin is optimized for performance. CSS and JavaScript are only loaded on product pages, and the code is minified and optimized. Most sites see no measurable performance impact.</p>
+
+                    <h4>Q: Can I customize the appearance?</h4>
+                    <p><strong>A:</strong> Yes! The plugin includes extensive styling options, multiple templates, color customization with reset options, and supports different toggle icon styles.</p>
+
+                    <h4>Q: What happens to my existing product tabs?</h4>
+                    <p><strong>A:</strong> Your content is preserved exactly as it was. The plugin simply changes how it's displayed - from horizontal tabs to vertical accordions. You can easily switch back by disabling the plugin.</p>
+
+                    <h3>Technical Questions</h3>
+                    
+                    <h4>Q: Does it work with variable products?</h4>
+                    <p><strong>A:</strong> Yes, accordions work perfectly with variable products, grouped products, and all WooCommerce product types.</p>
+
+                    <h4>Q: Can I add custom accordion sections?</h4>
+                    <p><strong>A:</strong> Absolutely! Use the built-in Custom Tabs Manager to create unlimited custom accordion sections with rich content, conditional display logic, and priority ordering.</p>
+
+                    <h4>Q: How do I reorder accordion items?</h4>
+                    <p><strong>A:</strong> Use the Priority setting in each custom tab (1-100, lower numbers appear first). Default WooCommerce tabs have fixed priorities, but custom tabs can be positioned anywhere.</p>
+
+                    <h4>Q: Can I show different tabs to different users?</h4>
+                    <p><strong>A:</strong> Yes! Use the conditional display logic to show tabs based on user roles, product categories, or product types.</p>
+
+                    <h4>Q: Is it translation-ready?</h4>
+                    <p><strong>A:</strong> Yes, the plugin is fully translation-ready and includes .pot files for easy translation. It's also compatible with WPML and Polylang.</p>
+
+                    <h4>Q: Does it work with page builders?</h4>
+                    <p><strong>A:</strong> Yes, it works with Elementor, Beaver Builder, Divi Builder, and other page builders that properly support WooCommerce product pages.</p>
+
+                    <h3>Custom Tabs Questions</h3>
+
+                    <h4>Q: How many custom tabs can I create?</h4>
+                    <p><strong>A:</strong> There's no limit! You can create as many custom tabs as needed. Use conditional logic to keep the interface clean for different user types.</p>
+
+                    <h4>Q: Can I use HTML in custom tabs?</h4>
+                    <p><strong>A:</strong> Yes, the custom tab editor supports HTML. Use the formatting toolbar for common elements or write HTML directly.</p>
+
+                    <h4>Q: Do custom tabs work with product variations?</h4>
+                    <p><strong>A:</strong> Yes, custom tabs work with all product types. You can even use conditional logic to show different tabs for different product types.</p>
+                </section>
+
+                <!-- Support -->
+                <section id="support" class="section">
+                    <h2>Get Support</h2>
+                    
+                    <h3>Before Contacting Support</h3>
+                    <ol>
+                        <li>Check this documentation for solutions</li>
+                        <li>Review the FAQ section above</li>
+                        <li>Test with default WordPress theme (Twenty Twenty-Four)</li>
+                        <li>Deactivate other plugins to check for conflicts</li>
+                        <li>Clear all caches (site cache, browser cache)</li>
+                    </ol>
+
+                    <h3>How to Get Help</h3>
+                    
+                    <h4>Support Ticket (Recommended)</h4>
+                    <ul>
+                        <li><strong>URL:</strong> support.wooaccordionpro.com</li>
+                        <li><strong>Response Time:</strong> 24-48 hours</li>
+                        <li><strong>What to Include:</strong> Site URL, detailed issue description, screenshots</li>
+                    </ul>
+
+                    <h4>Community Forum</h4>
+                    <ul>
+                        <li><strong>URL:</strong> community.wooaccordionpro.com</li>
+                        <li><strong>Best For:</strong> General questions, feature requests, sharing tips</li>
+                        <li><strong>Response Time:</strong> Community-driven (usually same day)</li>
+                    </ul>
+
+                    <h4>Video Tutorials</h4>
+                    <ul>
+                        <li><strong>YouTube Channel:</strong> WooAccordion Pro Official</li>
+                        <li><strong>Covers:</strong> Installation, configuration, custom tabs, troubleshooting</li>
+                        <li><strong>New Videos:</strong> Added weekly</li>
+                    </ul>
+
+                    <h3>System Information</h3>
+                    <p>When contacting support, please include this information:</p>
+                    <div class="code-block">WordPress Version: [Your version]
+WooCommerce Version: [Your version]
+Theme: [Your theme name and version]
+Plugin Version: [WooAccordion Pro version]
+PHP Version: [Your PHP version]
+Browser: [Your browser and version]
+Issue Description: [Detailed description]
+Steps to Reproduce: [Step-by-step instructions]</div>
+                </section>
+
+                <!-- Changelog -->
+                <section id="changelog" class="section">
+                    <h2>Changelog</h2>
+                    
+                    <h3>Version 1.0.0 (Current)</h3>
+                    <p><strong>Release Date:</strong> January 2025</p>
+                    <p><strong>Initial Release Features:</strong></p>
+                    <ul>
+                        <li>✨ Convert WooCommerce tabs to responsive accordions</li>
+                        <li>🎨 Multiple template styles (Modern, Minimal, Classic)</li>
+                        <li>🎯 Four toggle icon styles (Plus/Minus, Arrow, Chevron, Triangle)</li>
+                        <li>📱 Mobile-optimized touch gestures</li>
+                        <li>🔧 Complete custom tab management system</li>
+                        <li>🧠 Conditional display logic (categories, user roles, product types)</li>
+                        <li>🎛️ Advanced styling controls with color reset options</li>
+                        <li>⚡ Performance optimizations</li>
+                        <li>🌍 Translation-ready</li>
+                        <li>📝 Rich content editor for custom tabs</li>
+                        <li>🔄 Dynamic content placeholders</li>
+                    </ul>
+
+                    <h3>Key Features in v1.0.0</h3>
+
+                    <h4>Admin Interface</h4>
+                    <ul>
+                        <li>Premium admin design with tabbed interface</li>
+                        <li>Real-time color customization with reset buttons</li>
+                        <li>Template-based color schemes</li>
+                        <li>Custom tabs manager with modal editor</li>
+                        <li>Conditional logic builder</li>
+                    </ul>
+
+                    <h4>Frontend Features</h4>
+                    <ul>
+                        <li>Smooth accordion animations</li>
+                        <li>Responsive design for all devices</li>
+                        <li>Multiple icon styles</li>
+                        <li>Touch-friendly mobile interface</li>
+                        <li>Clean, professional templates</li>
+                    </ul>
+
+                    <h4>Developer Features</h4>
+                    <ul>
+                        <li>WordPress coding standards compliant</li>
+                        <li>Modular class structure</li>
+                        <li>Secure AJAX handling</li>
+                        <li>Proper sanitization and validation</li>
+                        <li>Hook-based architecture</li>
+                    </ul>
+
+                    <h3>What's Not Included (Future Versions)</h3>
+                    <ul>
+                        <li>Custom field integration (ACF, Meta Box) - Planned for v1.1</li>
+                        <li>Analytics dashboard - Planned for v1.2</li>
+                        <li>A/B testing functionality - Planned for v1.3</li>
+                        <li>Multi-level nested accordions - Under consideration</li>
+                        <li>Live preview in admin - Planned for v1.1</li>
+                    </ul>
+
+                    <div class="alert alert-info">
+                        <strong>Feature Requests:</strong> Have an idea for a new feature? Submit it through our community forum or support system!
+                    </div>
+                </section>
+
+                <!-- Final Note -->
+                <div class="alert alert-success" style="margin-top: 3rem;">
+                    <strong>Thank you for choosing WooAccordion Pro!</strong> We're committed to helping you create the best possible shopping experience for your customers. If you have any questions or feedback, don't hesitate to reach out to our support team.
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    // Update active link
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Smooth scroll to target
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Update active navigation based on scroll position
+        window.addEventListener('scroll', function() {
+            const sections = document.querySelectorAll('.section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.pageYOffset >= sectionTop - 200) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Set initial active state
+        document.querySelector('.nav-link[href="#overview"]').classList.add('active');
+    </script>
+</body>
+</html>
