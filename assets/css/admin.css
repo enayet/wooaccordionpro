@@ -996,8 +996,7 @@
     }
 }
 
-/*
-.wap-admin-wrap .notice.notice-error,
-.wap-admin-wrap notice.notice-warning {
+
+.wap-admin-wrap .notice{
     display: none !important;
-}*/
+}
